@@ -19,7 +19,7 @@
     --line:#ddd7c9;
     --muted:#8a8570;
     --muted-light:#b6b0a0;
-    --sidebar-w:260px;
+    --sidebar-w:270px;
   }
 
   body[data-theme="dark"]{
@@ -51,6 +51,7 @@
     transition:background .25s ease, color .25s ease;
   }
 
+  /* SIDEBAR */
   .sidebar{
     width:var(--sidebar-w);
     flex-shrink:0;
@@ -87,14 +88,59 @@
   }
   .new-btn:hover{ opacity:.85; }
 
+  .search-wrap{
+    padding:10px 12px 4px;
+  }
+  .search-input{
+    width:100%;
+    padding:9px 12px;
+    border-radius:9px;
+    border:2px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+    font-family:inherit;
+    font-size:13px;
+    outline:none;
+  }
+  .search-input:focus{ border-color:var(--muted); }
+  .search-input::placeholder{ color:var(--muted-light); }
+
   .comparisons{
     flex:1;
     overflow-y:auto;
-    padding:10px;
+    padding:8px 10px 10px;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+
+  .group-header{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:10px 8px 6px;
+    cursor:pointer;
+    user-select:none;
+    color:var(--muted);
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+  }
+  .group-header .chev{
+    transition:transform .18s ease;
+    font-size:10px;
+  }
+  .group-header.collapsed .chev{ transform:rotate(-90deg); }
+  .group-count{ color:var(--muted-light); font-weight:600; }
+  .group-body{
     display:flex;
     flex-direction:column;
     gap:6px;
+    padding-bottom:8px;
   }
+  .group-body.collapsed{ display:none; }
+
   .comp-item{
     padding:12px 14px;
     border-radius:10px;
@@ -107,13 +153,25 @@
     background:var(--paper);
     border-color:var(--line);
   }
+  .comp-item.drag-over{
+    border-color:var(--muted);
+    border-style:dashed;
+  }
+  .comp-item.dragging{ opacity:.4; }
+
+  .comp-top-row{
+    display:flex;
+    align-items:flex-start;
+    gap:6px;
+  }
   .comp-name{
     font-weight:600;
     font-size:14px;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
-    padding-right:20px;
+    flex:1;
+    min-width:0;
   }
   .comp-name.placeholder{ color:var(--muted-light); font-weight:400; }
   .comp-tally{
@@ -123,21 +181,51 @@
   }
   .comp-tally .p{ color:var(--pro); font-weight:600; }
   .comp-tally .c{ color:var(--con); font-weight:600; }
-  .comp-del{
+
+  .comp-actions{
     position:absolute;
-    top:8px;
-    right:8px;
+    top:6px;
+    right:6px;
+    display:none;
+    gap:2px;
+  }
+  .comp-item:hover .comp-actions{ display:flex; }
+  .comp-actions button{
     border:none;
     background:transparent;
     color:var(--muted-light);
-    font-size:15px;
+    font-size:14px;
     cursor:pointer;
-    display:none;
-    width:20px;
-    height:20px;
+    width:22px;
+    height:22px;
+    border-radius:6px;
+    line-height:1;
   }
-  .comp-item:hover .comp-del{ display:block; }
-  .comp-del:hover{ color:var(--con); }
+  .comp-actions button:hover{ background:var(--line); color:var(--ink); }
+  .comp-actions button.pin-btn.pinned{ color:var(--ink); }
+  .comp-actions button.del-btn:hover{ color:var(--con); background:var(--con-light); }
+
+  .comp-folder-input{
+    margin-top:6px;
+    width:100%;
+    border:none;
+    background:transparent;
+    border-bottom:1px dashed var(--line);
+    font-family:inherit;
+    font-size:11px;
+    color:var(--muted);
+    padding:2px 0;
+    outline:none;
+  }
+  .comp-folder-input:focus{ border-bottom-color:var(--muted); }
+  .comp-folder-input::placeholder{ color:var(--muted-light); }
+
+  .no-results{
+    text-align:center;
+    color:var(--muted-light);
+    font-size:13px;
+    padding:24px 10px;
+  }
 
   .sidebar-footer{
     padding:12px 18px;
@@ -146,6 +234,7 @@
     border-top:1px solid var(--line);
   }
 
+  /* MAIN */
   .main{
     flex:1;
     padding:32px 40px 80px;
@@ -159,9 +248,13 @@
   }
 
   .title-row{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
     margin-bottom:8px;
   }
   #mainThing{
+    flex:1;
     font-size:clamp(26px, 4vw, 38px);
     font-weight:700;
     background:transparent;
@@ -177,6 +270,22 @@
     border-bottom:3px solid var(--line);
   }
   #mainThing::placeholder{ color:var(--muted-light); }
+
+  .print-btn{
+    flex-shrink:0;
+    margin-top:8px;
+    padding:8px 14px;
+    border-radius:9px;
+    border:2px solid var(--line);
+    background:var(--card);
+    color:var(--ink);
+    font-family:inherit;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .print-btn:hover{ border-color:var(--muted); }
 
   .subtitle{
     color:var(--muted);
@@ -266,13 +375,31 @@
   .item{
     display:flex;
     align-items:flex-start;
-    gap:10px;
+    gap:8px;
     padding:10px 10px;
     border-radius:10px;
     background:var(--paper);
     border:1px solid var(--line);
     position:relative;
   }
+  .item.drag-over{
+    border-color:var(--muted);
+    border-style:dashed;
+  }
+  .item.dragging{ opacity:.35; }
+
+  .drag-handle{
+    flex-shrink:0;
+    cursor:grab;
+    color:var(--muted-light);
+    font-size:14px;
+    line-height:1.4;
+    padding-top:2px;
+    letter-spacing:-2px;
+    user-select:none;
+  }
+  .drag-handle:active{ cursor:grabbing; }
+
   .item textarea.text{
     flex:1;
     border:none;
@@ -322,18 +449,53 @@
     from{ opacity:0; transform:translateY(6px); }
     to{ opacity:1; transform:translateY(0); }
   }
+  @keyframes toastIn{
+    from{ opacity:0; transform:translate(-50%, 12px); }
+    to{ opacity:1; transform:translate(-50%, 0); }
+  }
 
   .item{ animation:slideIn .22s ease; transition:background .2s ease, border-color .2s ease; }
   .item.removing{ animation:slideOut .2s ease forwards; overflow:hidden; }
 
-  .col, .comp-item, .score, #mainThing, .new-btn, .add-btn, .del, .comp-del{
+  .col, .comp-item, .score, #mainThing, .new-btn, .add-btn, .del, .comp-actions button{
     transition:background .2s ease, border-color .2s ease, color .2s ease, transform .15s ease, box-shadow .2s ease;
   }
   .add-btn:active, .new-btn:active{ transform:scale(.88); }
   .comp-item{ animation:fadeSlide .2s ease; }
-  .comp-item:hover{ transform:translateX(2px); }
 
   .content-fade{ animation:fadeSlide .25s ease; }
+
+  /* TOAST */
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:26px;
+    transform:translateX(-50%);
+    background:var(--ink);
+    color:var(--paper);
+    padding:12px 16px;
+    border-radius:12px;
+    font-size:13px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    box-shadow:0 8px 24px rgba(0,0,0,.2);
+    animation:toastIn .2s ease;
+    z-index:50;
+  }
+  .toast button{
+    border:none;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:inherit;
+    font-weight:700;
+    font-size:12px;
+    padding:6px 12px;
+    border-radius:7px;
+    cursor:pointer;
+  }
+  .toast.error{ background:var(--con); }
+  .toast.error button{ color:var(--con); }
 
   /* SETTINGS */
   .settings-wrap{
@@ -405,6 +567,19 @@
     background:var(--ink);
     color:var(--paper);
   }
+
+  /* PRINT */
+  @media print{
+    .sidebar, .print-btn, .add-btn, .del, .drag-handle, .toast, .no-selection{ display:none !important; }
+    body{ display:block; background:#fff; color:#000; }
+    .main{ max-width:100%; padding:0; }
+    #mainThing{ border:none; color:#000; }
+    .col{ border:1px solid #999; break-inside:avoid; }
+    .item{ border:1px solid #ccc; background:#fff; }
+    .item textarea.text{ color:#000; }
+    .col-header{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .score.pro, .score.con{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  }
 </style>
 </head>
 <body>
@@ -412,8 +587,13 @@
 <div class="sidebar">
   <div class="sidebar-header">
     <h1>Comparisons</h1>
-    <button class="new-btn" onclick="newComparison()" title="New comparison">+</button>
+    <button class="new-btn" onclick="newComparison()" title="New comparison (Ctrl/Cmd+N)">+</button>
   </div>
+
+  <div class="search-wrap">
+    <input class="search-input" id="searchInput" type="text" placeholder="Search comparisons...">
+  </div>
+
   <div class="comparisons" id="comparisonList"></div>
 
   <div class="settings-wrap">
@@ -447,8 +627,9 @@
   <div id="content" class="content-fade" style="display:none;">
     <div class="title-row">
       <input id="mainThing" type="text" placeholder="What are you deciding?" />
+      <button class="print-btn" onclick="window.print()">Print / Export PDF</button>
     </div>
-    <div class="subtitle">changes save automatically</div>
+    <div class="subtitle">changes save automatically &middot; Enter adds a new item, Esc unfocuses</div>
 
     <div class="scoreboard">
       <div class="score pro"><span class="num" id="proCount">0</span> Pros</div>
@@ -480,18 +661,32 @@ const STORAGE_KEY = 'prosConsComparisons';
 const ACTIVE_KEY = 'prosConsActiveId';
 const SETTINGS_KEY = 'prosConsSettings';
 
+/* ---------- storage helpers (with quota-safe writes) ---------- */
+
+function safeSet(key, value){
+  try{
+    localStorage.setItem(key, value);
+    return true;
+  }catch(e){
+    showToast('Couldn\'t save — storage might be full.', { error:true });
+    return false;
+  }
+}
+
+/* ---------- settings ---------- */
+
 function loadSettings(){
   try{
     const raw = localStorage.getItem(SETTINGS_KEY);
-    if(raw) return JSON.parse(raw);
+    if(raw) return Object.assign({ theme:'system', colors:'on', collapsedFolders:[] }, JSON.parse(raw));
   }catch(e){}
-  return { theme:'system', colors:'on' };
+  return { theme:'system', colors:'on', collapsedFolders:[] };
 }
 
 let settings = loadSettings();
 
 function saveSettings(){
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  safeSet(SETTINGS_KEY, JSON.stringify(settings));
 }
 
 function applySettings(){
@@ -536,6 +731,19 @@ if(window.matchMedia){
   });
 }
 
+function isFolderCollapsed(name){
+  return settings.collapsedFolders.includes(name);
+}
+function toggleFolderCollapsed(name){
+  const i = settings.collapsedFolders.indexOf(name);
+  if(i === -1) settings.collapsedFolders.push(name);
+  else settings.collapsedFolders.splice(i,1);
+  saveSettings();
+  renderSidebar();
+}
+
+/* ---------- data ---------- */
+
 function loadAll(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -546,23 +754,87 @@ function loadAll(){
 
 let comparisons = loadAll();
 let activeId = localStorage.getItem(ACTIVE_KEY) || null;
+let searchQuery = '';
 
-function saveAll(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(comparisons));
+// migrate older records: ensure ids on items, folder/pinned fields exist
+comparisons.forEach(c => {
+  if(c.folder === undefined) c.folder = '';
+  if(c.pinned === undefined) c.pinned = false;
+  ['pros','cons'].forEach(type => {
+    (c[type] || []).forEach(item => {
+      if(!item.id) item.id = genId();
+    });
+  });
+});
+
+function saveAllNow(){
+  safeSet(STORAGE_KEY, JSON.stringify(comparisons));
 }
+
+// debounced save so rapid keystrokes don't hammer localStorage
+let saveTimer = null;
+function scheduleSave(){
+  if(saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    saveTimer = null;
+    saveAllNow();
+  }, 400);
+}
+function flushSave(){
+  if(saveTimer){
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
+  saveAllNow();
+}
+window.addEventListener('beforeunload', flushSave);
+
 function saveActive(){
-  if(activeId) localStorage.setItem(ACTIVE_KEY, activeId);
+  if(activeId) safeSet(ACTIVE_KEY, activeId);
 }
 
 function genId(){
-  return 'c' + Date.now() + Math.random().toString(36).slice(2,7);
+  return 'i' + Date.now() + Math.random().toString(36).slice(2,7);
 }
 
+/* ---------- toast / undo ---------- */
+
+let toastEl = null;
+let toastTimer = null;
+
+function showToast(message, opts){
+  opts = opts || {};
+  hideToast();
+  toastEl = document.createElement('div');
+  toastEl.className = 'toast' + (opts.error ? ' error' : '');
+  const msg = document.createElement('span');
+  msg.textContent = message;
+  toastEl.appendChild(msg);
+  if(opts.onUndo){
+    const btn = document.createElement('button');
+    btn.textContent = 'Undo';
+    btn.onclick = () => {
+      opts.onUndo();
+      hideToast();
+    };
+    toastEl.appendChild(btn);
+  }
+  document.body.appendChild(toastEl);
+  toastTimer = setTimeout(hideToast, opts.error ? 3500 : 6000);
+}
+
+function hideToast(){
+  if(toastTimer){ clearTimeout(toastTimer); toastTimer = null; }
+  if(toastEl){ toastEl.remove(); toastEl = null; }
+}
+
+/* ---------- comparisons ---------- */
+
 function newComparison(){
-  const comp = { id: genId(), title:'', pros:[], cons:[] };
+  const comp = { id: genId(), title:'', folder:'', pinned:false, pros:[], cons:[] };
   comparisons.unshift(comp);
   activeId = comp.id;
-  saveAll();
+  flushSave();
   saveActive();
   renderSidebar();
   renderMain();
@@ -570,6 +842,7 @@ function newComparison(){
 }
 
 function selectComparison(id){
+  flushSave();
   activeId = id;
   saveActive();
   renderSidebar();
@@ -578,47 +851,207 @@ function selectComparison(id){
 
 function deleteComparison(id, evt){
   evt.stopPropagation();
-  comparisons = comparisons.filter(c => c.id !== id);
+  const idx = comparisons.findIndex(c => c.id === id);
+  if(idx === -1) return;
+  const removed = comparisons[idx];
+  comparisons.splice(idx, 1);
   if(activeId === id){
     activeId = comparisons.length ? comparisons[0].id : null;
     saveActive();
   }
-  saveAll();
+  flushSave();
   renderSidebar();
   renderMain();
+
+  showToast('Comparison deleted.', {
+    onUndo: () => {
+      comparisons.splice(idx, 0, removed);
+      activeId = removed.id;
+      saveActive();
+      flushSave();
+      renderSidebar();
+      renderMain();
+    }
+  });
+}
+
+function togglePin(id, evt){
+  evt.stopPropagation();
+  const comp = comparisons.find(c => c.id === id);
+  if(!comp) return;
+  comp.pinned = !comp.pinned;
+  flushSave();
+  renderSidebar();
+}
+
+function updateFolder(id, value){
+  const comp = comparisons.find(c => c.id === id);
+  if(!comp) return;
+  comp.folder = value.trim();
+  scheduleSave();
 }
 
 function getActive(){
   return comparisons.find(c => c.id === activeId) || null;
 }
 
+/* ---------- sidebar: search, grouping, drag-reorder ---------- */
+
+let draggedCompId = null;
+
 function renderSidebar(){
   const list = document.getElementById('comparisonList');
   list.innerHTML = '';
-  comparisons.forEach(comp => {
-    const div = document.createElement('div');
-    div.className = 'comp-item' + (comp.id === activeId ? ' active' : '');
-    div.onclick = () => selectComparison(comp.id);
 
-    const name = document.createElement('div');
-    name.className = 'comp-name' + (comp.title ? '' : ' placeholder');
-    name.textContent = comp.title || 'Untitled';
+  const q = searchQuery.trim().toLowerCase();
+  const visible = q
+    ? comparisons.filter(c => (c.title || 'untitled').toLowerCase().includes(q) || (c.folder || '').toLowerCase().includes(q))
+    : comparisons;
 
-    const tally = document.createElement('div');
-    tally.className = 'comp-tally';
-    tally.innerHTML = `<span class="p">${comp.pros.length}</span> pros \u00b7 <span class="c">${comp.cons.length}</span> cons`;
+  if(comparisons.length === 0){
+    const hint = document.createElement('div');
+    hint.className = 'no-results';
+    hint.textContent = 'No comparisons yet. Click + to start one.';
+    list.appendChild(hint);
+    return;
+  }
+  if(visible.length === 0){
+    const hint = document.createElement('div');
+    hint.className = 'no-results';
+    hint.textContent = 'No comparisons match your search.';
+    list.appendChild(hint);
+    return;
+  }
 
-    const delBtn = document.createElement('button');
-    delBtn.className = 'comp-del';
-    delBtn.textContent = '\u00d7';
-    delBtn.onclick = (e) => deleteComparison(comp.id, e);
+  const pinned = visible.filter(c => c.pinned);
+  const unpinned = visible.filter(c => !c.pinned);
 
-    div.appendChild(name);
-    div.appendChild(tally);
-    div.appendChild(delBtn);
-    list.appendChild(div);
+  const folderNames = Array.from(new Set(unpinned.map(c => c.folder || ''))).sort((a,b) => {
+    if(a === '') return 1;
+    if(b === '') return -1;
+    return a.localeCompare(b);
+  });
+
+  if(pinned.length){
+    renderGroup(list, 'Pinned', pinned, false, q);
+  }
+  folderNames.forEach(name => {
+    const items = unpinned.filter(c => (c.folder || '') === name);
+    renderGroup(list, name || 'Unsorted', items, true, q);
   });
 }
+
+function renderGroup(list, name, items, collapsible, forceExpand){
+  const collapsed = collapsible && !forceExpand && isFolderCollapsed(name);
+
+  const header = document.createElement('div');
+  header.className = 'group-header' + (collapsed ? ' collapsed' : '');
+  header.innerHTML = `<span class="chev">&#9662;</span> ${escapeHtml(name)} <span class="group-count">${items.length}</span>`;
+  if(collapsible){
+    header.onclick = () => toggleFolderCollapsed(name);
+  } else {
+    header.style.cursor = 'default';
+  }
+  list.appendChild(header);
+
+  const body = document.createElement('div');
+  body.className = 'group-body' + (collapsed ? ' collapsed' : '');
+  items.forEach(comp => body.appendChild(buildCompItem(comp)));
+  list.appendChild(body);
+}
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function buildCompItem(comp){
+  const div = document.createElement('div');
+  div.className = 'comp-item' + (comp.id === activeId ? ' active' : '');
+  div.draggable = true;
+  div.dataset.id = comp.id;
+  div.onclick = () => selectComparison(comp.id);
+
+  div.addEventListener('dragstart', (e) => {
+    draggedCompId = comp.id;
+    div.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  div.addEventListener('dragend', () => {
+    div.classList.remove('dragging');
+    document.querySelectorAll('.comp-item.drag-over').forEach(el => el.classList.remove('drag-over'));
+  });
+  div.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    if(draggedCompId && draggedCompId !== comp.id) div.classList.add('drag-over');
+  });
+  div.addEventListener('dragleave', () => div.classList.remove('drag-over'));
+  div.addEventListener('drop', (e) => {
+    e.preventDefault();
+    div.classList.remove('drag-over');
+    if(!draggedCompId || draggedCompId === comp.id) return;
+    const fromIdx = comparisons.findIndex(c => c.id === draggedCompId);
+    const toIdx = comparisons.findIndex(c => c.id === comp.id);
+    if(fromIdx === -1 || toIdx === -1) return;
+    const [moved] = comparisons.splice(fromIdx, 1);
+    comparisons.splice(toIdx, 0, moved);
+    draggedCompId = null;
+    flushSave();
+    renderSidebar();
+  });
+
+  const topRow = document.createElement('div');
+  topRow.className = 'comp-top-row';
+
+  const name = document.createElement('div');
+  name.className = 'comp-name' + (comp.title ? '' : ' placeholder');
+  name.textContent = comp.title || 'Untitled';
+  topRow.appendChild(name);
+  div.appendChild(topRow);
+
+  const tally = document.createElement('div');
+  tally.className = 'comp-tally';
+  tally.innerHTML = `<span class="p">${comp.pros.length}</span> pros \u00b7 <span class="c">${comp.cons.length}</span> cons`;
+  div.appendChild(tally);
+
+  const folderInput = document.createElement('input');
+  folderInput.className = 'comp-folder-input';
+  folderInput.placeholder = 'No folder';
+  folderInput.value = comp.folder || '';
+  folderInput.onclick = (e) => e.stopPropagation();
+  folderInput.oninput = (e) => updateFolder(comp.id, e.target.value);
+  folderInput.onblur = () => { flushSave(); renderSidebar(); };
+  div.appendChild(folderInput);
+
+  const actions = document.createElement('div');
+  actions.className = 'comp-actions';
+
+  const pinBtn = document.createElement('button');
+  pinBtn.className = 'pin-btn' + (comp.pinned ? ' pinned' : '');
+  pinBtn.title = comp.pinned ? 'Unpin' : 'Pin';
+  pinBtn.textContent = comp.pinned ? '\u2605' : '\u2606';
+  pinBtn.onclick = (e) => togglePin(comp.id, e);
+  actions.appendChild(pinBtn);
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'del-btn';
+  delBtn.title = 'Delete';
+  delBtn.textContent = '\u00d7';
+  delBtn.onclick = (e) => deleteComparison(comp.id, e);
+  actions.appendChild(delBtn);
+
+  div.appendChild(actions);
+
+  return div;
+}
+
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  searchQuery = e.target.value;
+  renderSidebar();
+});
+
+/* ---------- main panel ---------- */
 
 function renderMain(){
   const comp = getActive();
@@ -637,20 +1070,30 @@ function renderMain(){
   mainThing.value = comp.title || '';
   mainThing.oninput = () => {
     comp.title = mainThing.value;
-    saveAll();
-    renderSidebar();
+    scheduleSave();
+    renderSidebarTitleOnly(comp);
   };
+  mainThing.onblur = () => { flushSave(); renderSidebar(); };
 
   renderList('pros', 'prosList', comp);
   renderList('cons', 'consList', comp);
   updateScoreboard(comp);
 }
 
+// lightweight sidebar refresh while typing a title (avoids full re-render/flicker)
+function renderSidebarTitleOnly(comp){
+  const el = document.querySelector(`.comp-item[data-id="${comp.id}"] .comp-name`);
+  if(el){
+    el.textContent = comp.title || 'Untitled';
+    el.classList.toggle('placeholder', !comp.title);
+  }
+}
+
 function addItem(type){
   const comp = getActive();
   if(!comp) return;
-  comp[type].push({ text:'' });
-  saveAll();
+  comp[type].push({ id: genId(), text:'' });
+  flushSave();
   renderMain();
   renderSidebar();
   requestAnimationFrame(() => {
@@ -663,10 +1106,22 @@ function addItem(type){
 function removeItem(type, idx, li){
   const doRemove = () => {
     const comp = getActive();
-    comp[type].splice(idx,1);
-    saveAll();
+    if(!comp) return;
+    const [removed] = comp[type].splice(idx, 1);
+    flushSave();
     renderMain();
     renderSidebar();
+
+    showToast((type === 'pros' ? 'Pro' : 'Con') + ' removed.', {
+      onUndo: () => {
+        const c = getActive();
+        if(!c) return;
+        c[type].splice(idx, 0, removed);
+        flushSave();
+        renderMain();
+        renderSidebar();
+      }
+    });
   };
   if(li){
     li.classList.add('removing');
@@ -679,13 +1134,15 @@ function removeItem(type, idx, li){
 function updateText(type, idx, val){
   const comp = getActive();
   comp[type][idx].text = val;
-  saveAll();
+  scheduleSave();
 }
 
 function autoGrow(el){
   el.style.height = 'auto';
   el.style.height = el.scrollHeight + 'px';
 }
+
+let draggedItem = null; // { type, id }
 
 function renderList(type, listId, comp){
   const list = document.getElementById(listId);
@@ -703,6 +1160,46 @@ function renderList(type, listId, comp){
   items.forEach((item, idx) => {
     const li = document.createElement('li');
     li.className = 'item';
+    li.draggable = false; // dragging is initiated from the handle only
+    li.dataset.id = item.id;
+
+    const handle = document.createElement('div');
+    handle.className = 'drag-handle';
+    handle.title = 'Drag to reorder';
+    handle.textContent = '\u22ee\u22ee';
+    handle.addEventListener('mousedown', () => { li.draggable = true; });
+    handle.addEventListener('touchstart', () => { li.draggable = true; }, { passive:true });
+
+    li.addEventListener('dragstart', (e) => {
+      draggedItem = { type, id: item.id };
+      li.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    li.addEventListener('dragend', () => {
+      li.draggable = false;
+      li.classList.remove('dragging');
+      list.querySelectorAll('.item.drag-over').forEach(el => el.classList.remove('drag-over'));
+    });
+    li.addEventListener('dragover', (e) => {
+      if(!draggedItem || draggedItem.type !== type || draggedItem.id === item.id) return;
+      e.preventDefault();
+      li.classList.add('drag-over');
+    });
+    li.addEventListener('dragleave', () => li.classList.remove('drag-over'));
+    li.addEventListener('drop', (e) => {
+      e.preventDefault();
+      li.classList.remove('drag-over');
+      if(!draggedItem || draggedItem.type !== type || draggedItem.id === item.id) return;
+      const arr = getActive()[type];
+      const fromIdx = arr.findIndex(i => i.id === draggedItem.id);
+      const toIdx = arr.findIndex(i => i.id === item.id);
+      if(fromIdx === -1 || toIdx === -1) return;
+      const [moved] = arr.splice(fromIdx, 1);
+      arr.splice(toIdx, 0, moved);
+      draggedItem = null;
+      flushSave();
+      renderMain();
+    });
 
     const textArea = document.createElement('textarea');
     textArea.className = 'text';
@@ -713,12 +1210,23 @@ function renderList(type, listId, comp){
       updateText(type, idx, e.target.value);
       autoGrow(e.target);
     });
+    textArea.addEventListener('blur', flushSave);
+    textArea.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter' && !e.shiftKey){
+        e.preventDefault();
+        flushSave();
+        addItem(type);
+      } else if(e.key === 'Escape'){
+        e.target.blur();
+      }
+    });
 
     const delBtn = document.createElement('button');
     delBtn.className = 'del';
     delBtn.textContent = '\u00d7';
     delBtn.onclick = () => removeItem(type, idx, li);
 
+    li.appendChild(handle);
     li.appendChild(textArea);
     li.appendChild(delBtn);
     list.appendChild(li);
@@ -744,6 +1252,26 @@ function updateScoreboard(comp){
     winnerLine.textContent = "It's a tie";
   }
 }
+
+/* ---------- global keyboard shortcuts ---------- */
+
+document.addEventListener('keydown', (e) => {
+  // Escape: blur whatever is focused
+  if(e.key === 'Escape'){
+    if(document.activeElement && document.activeElement !== document.body){
+      document.activeElement.blur();
+    }
+    return;
+  }
+  // Ctrl/Cmd+N: new comparison (note: some browsers reserve this shortcut
+  // for opening a new window and won't let a page override it)
+  if((e.ctrlKey || e.metaKey) && (e.key === 'n' || e.key === 'N')){
+    e.preventDefault();
+    newComparison();
+  }
+});
+
+/* ---------- init ---------- */
 
 if(!comparisons.find(c => c.id === activeId)){
   activeId = comparisons.length ? comparisons[0].id : null;
