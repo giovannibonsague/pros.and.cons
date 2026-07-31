@@ -15,9 +15,31 @@
     --con-light:#fbeae8;
     --ink:#1f2320;
     --paper:#faf8f3;
+    --card:#ffffff;
     --line:#ddd7c9;
+    --muted:#8a8570;
+    --muted-light:#b6b0a0;
     --sidebar-w:260px;
   }
+
+  body[data-theme="dark"]{
+    --ink:#f0ede4;
+    --paper:#1b1c19;
+    --card:#242522;
+    --line:#3a3b36;
+    --muted:#a19c8a;
+    --muted-light:#6f6b5c;
+    --pro-light:#1e3129;
+    --con-light:#32211f;
+  }
+
+  body[data-colors="off"]{
+    --pro:#4a4a48;
+    --pro-light:var(--card);
+    --con:#4a4a48;
+    --con-light:var(--card);
+  }
+
   *{box-sizing:border-box;}
   html,body{height:100%;}
   body{
@@ -26,12 +48,13 @@
     background:var(--paper);
     color:var(--ink);
     display:flex;
+    transition:background .25s ease, color .25s ease;
   }
 
   .sidebar{
     width:var(--sidebar-w);
     flex-shrink:0;
-    background:#fff;
+    background:var(--card);
     border-right:2px solid var(--line);
     height:100vh;
     position:sticky;
@@ -92,10 +115,10 @@
     text-overflow:ellipsis;
     padding-right:20px;
   }
-  .comp-name.placeholder{ color:#b6b0a0; font-weight:400; }
+  .comp-name.placeholder{ color:var(--muted-light); font-weight:400; }
   .comp-tally{
     font-size:12px;
-    color:#8a8570;
+    color:var(--muted);
     margin-top:3px;
   }
   .comp-tally .p{ color:var(--pro); font-weight:600; }
@@ -106,7 +129,7 @@
     right:8px;
     border:none;
     background:transparent;
-    color:#c2bca8;
+    color:var(--muted-light);
     font-size:15px;
     cursor:pointer;
     display:none;
@@ -119,7 +142,7 @@
   .sidebar-footer{
     padding:12px 18px;
     font-size:11px;
-    color:#b6b0a0;
+    color:var(--muted-light);
     border-top:1px solid var(--line);
   }
 
@@ -130,7 +153,7 @@
   }
   .no-selection{
     text-align:center;
-    color:#b6b0a0;
+    color:var(--muted-light);
     margin-top:120px;
     font-size:16px;
   }
@@ -153,10 +176,10 @@
   #mainThing:hover, #mainThing:focus{
     border-bottom:3px solid var(--line);
   }
-  #mainThing::placeholder{ color:#b6b0a0; }
+  #mainThing::placeholder{ color:var(--muted-light); }
 
   .subtitle{
-    color:#8a8570;
+    color:var(--muted);
     font-size:13px;
     margin-bottom:26px;
     letter-spacing:.02em;
@@ -183,7 +206,7 @@
   .score .num{ font-size:24px; }
   .winner{
     font-size:13px;
-    color:#8a8570;
+    color:var(--muted);
     margin:-18px 0 26px;
     min-height:16px;
   }
@@ -198,7 +221,7 @@
   }
 
   .col{
-    background:#fff;
+    background:var(--card);
     border-radius:18px;
     border:2px solid var(--line);
     overflow:hidden;
@@ -259,14 +282,14 @@
     outline:none;
     min-width:0;
   }
-  .item input.text::placeholder{ color:#b6b0a0; }
+  .item input.text::placeholder{ color:var(--muted-light); }
 
   .tally{
     display:flex;
     align-items:center;
     gap:6px;
     font-size:14px;
-    color:#8a8570;
+    color:var(--muted);
     white-space:nowrap;
   }
   .tally-marks{
@@ -282,7 +305,7 @@
     height:22px;
     border-radius:6px;
     border:1px solid var(--line);
-    background:#fff;
+    background:var(--card);
     cursor:pointer;
     font-size:13px;
     line-height:1;
@@ -293,7 +316,7 @@
   .del{
     border:none;
     background:transparent;
-    color:#c2bca8;
+    color:var(--muted-light);
     cursor:pointer;
     font-size:16px;
     width:20px;
@@ -302,9 +325,114 @@
 
   .empty-hint{
     text-align:center;
-    color:#b6b0a0;
+    color:var(--muted-light);
     font-size:13px;
     padding:10px;
+  }
+
+  /* ANIMATIONS */
+  @keyframes slideIn{
+    from{ opacity:0; transform:translateY(-8px) scale(.98); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  @keyframes slideOut{
+    from{ opacity:1; transform:translateX(0); max-height:60px; margin-bottom:8px; }
+    to{ opacity:0; transform:translateX(12px); max-height:0; margin-bottom:0; padding-top:0; padding-bottom:0; }
+  }
+  @keyframes bump{
+    0%{ transform:scale(1); }
+    40%{ transform:scale(1.35); }
+    100%{ transform:scale(1); }
+  }
+  @keyframes fadeSlide{
+    from{ opacity:0; transform:translateY(6px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .item{ animation:slideIn .22s ease; transition:background .2s ease, border-color .2s ease, transform .15s ease; }
+  .item.removing{ animation:slideOut .2s ease forwards; overflow:hidden; }
+  .item:hover{ transform:translateY(-1px); }
+
+  .tally-marks.bump{ animation:bump .28s ease; }
+
+  .col, .comp-item, .score, #mainThing, .new-btn, .add-btn, .tally button, .del, .comp-del{
+    transition:background .2s ease, border-color .2s ease, color .2s ease, transform .15s ease, box-shadow .2s ease;
+  }
+  .add-btn:active, .new-btn:active, .tally button:active{ transform:scale(.88); }
+  .comp-item{ animation:fadeSlide .2s ease; }
+  .comp-item:hover{ transform:translateX(2px); }
+
+  .content-fade{ animation:fadeSlide .25s ease; }
+
+  /* SETTINGS */
+  .settings-wrap{
+    border-top:1px solid var(--line);
+    padding:10px;
+  }
+  .settings-toggle{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 12px;
+    background:transparent;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    color:var(--ink);
+    font-family:inherit;
+    font-size:13px;
+    font-weight:600;
+  }
+  .settings-toggle:hover{ background:var(--paper); }
+  .settings-toggle .chev{
+    transition:transform .2s ease;
+    color:var(--muted);
+  }
+  .settings-toggle.open .chev{ transform:rotate(180deg); }
+
+  .settings-panel{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .25s ease;
+  }
+  .settings-panel.open{ max-height:280px; }
+
+  .settings-group{
+    padding:10px 12px 4px;
+  }
+  .settings-label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--muted);
+    margin-bottom:8px;
+    font-weight:600;
+  }
+  .settings-options{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .settings-btn{
+    flex:1;
+    min-width:70px;
+    padding:8px 6px;
+    border-radius:8px;
+    border:2px solid var(--line);
+    background:var(--card);
+    color:var(--ink);
+    font-family:inherit;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .settings-btn:hover{ border-color:var(--muted); }
+  .settings-btn.active{
+    border-color:var(--ink);
+    background:var(--ink);
+    color:var(--paper);
   }
 </style>
 </head>
@@ -316,13 +444,36 @@
     <button class="new-btn" onclick="newComparison()" title="New comparison">+</button>
   </div>
   <div class="comparisons" id="comparisonList"></div>
+
+  <div class="settings-wrap">
+    <button class="settings-toggle" id="settingsToggle" onclick="toggleSettings()">
+      Settings
+      <span class="chev">&#9662;</span>
+    </button>
+    <div class="settings-panel" id="settingsPanel">
+      <div class="settings-group">
+        <div class="settings-label">Theme</div>
+        <div class="settings-options" id="themeOptions">
+          <button class="settings-btn" data-value="light" onclick="setTheme('light')">Light</button>
+          <button class="settings-btn" data-value="dark" onclick="setTheme('dark')">Dark</button>
+          <button class="settings-btn" data-value="system" onclick="setTheme('system')">System</button>
+        </div>
+        <div class="settings-label">Color style</div>
+        <div class="settings-options" id="colorOptions">
+          <button class="settings-btn" data-value="on" onclick="setColors('on')">Colors</button>
+          <button class="settings-btn" data-value="off" onclick="setColors('off')">No colors</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="sidebar-footer">Stored locally in this browser</div>
 </div>
 
 <div class="main" id="main">
   <div class="no-selection" id="noSelection">Select a comparison on the left, or start a new one.</div>
 
-  <div id="content" style="display:none;">
+  <div id="content" class="content-fade" style="display:none;">
     <div class="title-row">
       <input id="mainThing" type="text" placeholder="What are you deciding?" />
     </div>
@@ -356,6 +507,63 @@
 <script>
 const STORAGE_KEY = 'prosConsComparisons';
 const ACTIVE_KEY = 'prosConsActiveId';
+const SETTINGS_KEY = 'prosConsSettings';
+
+function loadSettings(){
+  try{
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { theme:'system', colors:'on' };
+}
+
+let settings = loadSettings();
+
+function saveSettings(){
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+function applySettings(){
+  const body = document.body;
+  let effectiveTheme = settings.theme;
+  if(effectiveTheme === 'system'){
+    effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  body.setAttribute('data-theme', effectiveTheme);
+  body.setAttribute('data-colors', settings.colors);
+
+  document.querySelectorAll('#themeOptions .settings-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.value === settings.theme);
+  });
+  document.querySelectorAll('#colorOptions .settings-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.value === settings.colors);
+  });
+}
+
+function setTheme(value){
+  settings.theme = value;
+  saveSettings();
+  applySettings();
+}
+
+function setColors(value){
+  settings.colors = value;
+  saveSettings();
+  applySettings();
+}
+
+function toggleSettings(){
+  const panel = document.getElementById('settingsPanel');
+  const toggle = document.getElementById('settingsToggle');
+  panel.classList.toggle('open');
+  toggle.classList.toggle('open');
+}
+
+if(window.matchMedia){
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if(settings.theme === 'system') applySettings();
+  });
+}
 
 function loadAll(){
   try{
@@ -481,12 +689,20 @@ function addItem(type){
   });
 }
 
-function removeItem(type, idx){
-  const comp = getActive();
-  comp[type].splice(idx,1);
-  saveAll();
-  renderMain();
-  renderSidebar();
+function removeItem(type, idx, li){
+  const doRemove = () => {
+    const comp = getActive();
+    comp[type].splice(idx,1);
+    saveAll();
+    renderMain();
+    renderSidebar();
+  };
+  if(li){
+    li.classList.add('removing');
+    li.addEventListener('animationend', doRemove, { once:true });
+  } else {
+    doRemove();
+  }
 }
 
 function updateText(type, idx, val){
@@ -495,11 +711,14 @@ function updateText(type, idx, val){
   saveAll();
 }
 
+let lastBumped = null;
+
 function changeTally(type, idx, delta){
   const comp = getActive();
   const item = comp[type][idx];
   item.tally = Math.max(0, item.tally + delta);
   saveAll();
+  lastBumped = type + '-' + idx;
   renderMain();
 }
 
@@ -537,6 +756,12 @@ function renderList(type, listId, comp){
     const marks = document.createElement('span');
     marks.className = 'tally-marks';
     marks.textContent = item.tally;
+    if(lastBumped === type + '-' + idx){
+      marks.classList.add('bump');
+      requestAnimationFrame(() => {
+        setTimeout(() => { lastBumped = null; }, 300);
+      });
+    }
 
     const plusBtn = document.createElement('button');
     plusBtn.textContent = '+';
@@ -549,7 +774,7 @@ function renderList(type, listId, comp){
     const delBtn = document.createElement('button');
     delBtn.className = 'del';
     delBtn.textContent = '\u00d7';
-    delBtn.onclick = () => removeItem(type, idx);
+    delBtn.onclick = () => removeItem(type, idx, li);
 
     li.appendChild(textInput);
     li.appendChild(tallyWrap);
@@ -579,6 +804,7 @@ function updateScoreboard(comp){
 if(!comparisons.find(c => c.id === activeId)){
   activeId = comparisons.length ? comparisons[0].id : null;
 }
+applySettings();
 renderSidebar();
 renderMain();
 </script>
