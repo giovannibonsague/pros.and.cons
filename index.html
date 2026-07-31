@@ -40,45 +40,6 @@
     --con-light:var(--card);
   }
 
-  /* BLACK & WHITE MODE: pros = black, cons = white */
-  body[data-colors="bw"]{
-    --pro:#000000;
-    --pro-light:#e4e4e2;
-    --con:#ffffff;
-    --con-light:#3a3a38;
-  }
-  body[data-theme="dark"][data-colors="bw"]{
-    --pro-light:#2b2b29;
-    --con-light:#050505;
-  }
-
-  /* cons header (white bg) needs dark text + dark accents, always */
-  body[data-colors="bw"] .col.cons .col-header{ color:#000; }
-  body[data-colors="bw"] .col.cons .add-btn{ background:rgba(0,0,0,.12); color:#000; }
-  body[data-colors="bw"] .col.cons .add-btn:hover{ background:rgba(0,0,0,.22); }
-
-  /* outline black shapes/text when they'd blend into a dark background */
-  body[data-theme="dark"][data-colors="bw"] .col.pros .col-header,
-  body[data-theme="dark"][data-colors="bw"] .score.pro{
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.7);
-  }
-  body[data-theme="dark"][data-colors="bw"] .col.pros .tally-marks,
-  body[data-theme="dark"][data-colors="bw"] .comp-tally .p{
-    -webkit-text-stroke: .5px #fff;
-    text-shadow: 0 0 1px rgba(255,255,255,.8);
-  }
-
-  /* outline white shapes/text when they'd blend into a light background */
-  body[data-theme="light"][data-colors="bw"] .col.cons .col-header,
-  body[data-theme="light"][data-colors="bw"] .score.con{
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,.7);
-  }
-  body[data-theme="light"][data-colors="bw"] .col.cons .tally-marks,
-  body[data-theme="light"][data-colors="bw"] .comp-tally .c{
-    -webkit-text-stroke: .5px #000;
-    text-shadow: 0 0 1px rgba(0,0,0,.8);
-  }
-
   *{box-sizing:border-box;}
   html,body{height:100%;}
   body{
@@ -304,27 +265,15 @@
 
   .item{
     display:flex;
-    align-items:center;
+    align-items:flex-start;
     gap:10px;
-    padding:8px 10px;
+    padding:10px 10px;
     border-radius:10px;
     background:var(--paper);
     border:1px solid var(--line);
     position:relative;
-    overflow:hidden;
   }
-  .item > *{ position:relative; z-index:1; }
-  .weight-fill{
-    position:absolute;
-    left:0; top:0; bottom:0;
-    width:0%;
-    z-index:0;
-    transition:width .35s cubic-bezier(.4,0,.2,1);
-    pointer-events:none;
-  }
-  .col.pros .weight-fill{ background:var(--pro-light); }
-  .col.cons .weight-fill{ background:var(--con-light); }
-  .item input.text{
+  .item textarea.text{
     flex:1;
     border:none;
     background:transparent;
@@ -333,41 +282,14 @@
     color:var(--ink);
     outline:none;
     min-width:0;
+    resize:none;
+    overflow:hidden;
+    line-height:1.4;
+    padding:2px 0;
+    min-height:20px;
+    transition:height .15s ease;
   }
-  .item input.text::placeholder{ color:var(--muted-light); }
-
-  .tally{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-size:14px;
-    color:var(--muted);
-    white-space:nowrap;
-  }
-  .tally button:disabled{
-    opacity:.35;
-    cursor:not-allowed;
-  }
-  .tally-marks{
-    font-weight:600;
-    min-width:14px;
-    text-align:center;
-  }
-  .col.pros .tally-marks{ color:var(--pro); }
-  .col.cons .tally-marks{ color:var(--con); }
-
-  .tally button{
-    width:22px;
-    height:22px;
-    border-radius:6px;
-    border:1px solid var(--line);
-    background:var(--card);
-    cursor:pointer;
-    font-size:13px;
-    line-height:1;
-    color:var(--ink);
-  }
-  .tally button:hover{ background:var(--line); }
+  .item textarea.text::placeholder{ color:var(--muted-light); }
 
   .del{
     border:none;
@@ -376,6 +298,7 @@
     cursor:pointer;
     font-size:16px;
     width:20px;
+    margin-top:1px;
   }
   .del:hover{ color:var(--con); }
 
@@ -395,26 +318,18 @@
     from{ opacity:1; transform:translateX(0); max-height:60px; margin-bottom:8px; }
     to{ opacity:0; transform:translateX(12px); max-height:0; margin-bottom:0; padding-top:0; padding-bottom:0; }
   }
-  @keyframes bump{
-    0%{ transform:scale(1); }
-    40%{ transform:scale(1.35); }
-    100%{ transform:scale(1); }
-  }
   @keyframes fadeSlide{
     from{ opacity:0; transform:translateY(6px); }
     to{ opacity:1; transform:translateY(0); }
   }
 
-  .item{ animation:slideIn .22s ease; transition:background .2s ease, border-color .2s ease, transform .15s ease; }
+  .item{ animation:slideIn .22s ease; transition:background .2s ease, border-color .2s ease; }
   .item.removing{ animation:slideOut .2s ease forwards; overflow:hidden; }
-  .item:hover{ transform:translateY(-1px); }
 
-  .tally-marks.bump{ animation:bump .28s ease; }
-
-  .col, .comp-item, .score, #mainThing, .new-btn, .add-btn, .tally button, .del, .comp-del{
+  .col, .comp-item, .score, #mainThing, .new-btn, .add-btn, .del, .comp-del{
     transition:background .2s ease, border-color .2s ease, color .2s ease, transform .15s ease, box-shadow .2s ease;
   }
-  .add-btn:active, .new-btn:active, .tally button:active{ transform:scale(.88); }
+  .add-btn:active, .new-btn:active{ transform:scale(.88); }
   .comp-item{ animation:fadeSlide .2s ease; }
   .comp-item:hover{ transform:translateX(2px); }
 
@@ -518,7 +433,6 @@
         <div class="settings-options" id="colorOptions">
           <button class="settings-btn" data-value="on" onclick="setColors('on')">Colors</button>
           <button class="settings-btn" data-value="off" onclick="setColors('off')">No colors</button>
-          <button class="settings-btn" data-value="bw" onclick="setColors('bw')">Black &amp; White</button>
         </div>
       </div>
     </div>
@@ -735,13 +649,13 @@ function renderMain(){
 function addItem(type){
   const comp = getActive();
   if(!comp) return;
-  comp[type].push({ text:'', tally:0 });
+  comp[type].push({ text:'' });
   saveAll();
   renderMain();
   renderSidebar();
   requestAnimationFrame(() => {
     const list = document.getElementById(type === 'pros' ? 'prosList' : 'consList');
-    const inputs = list.querySelectorAll('input.text');
+    const inputs = list.querySelectorAll('textarea.text');
     if(inputs.length) inputs[inputs.length-1].focus();
   });
 }
@@ -768,16 +682,9 @@ function updateText(type, idx, val){
   saveAll();
 }
 
-const MAX_TALLY = 10;
-let lastBumped = null;
-
-function changeTally(type, idx, delta){
-  const comp = getActive();
-  const item = comp[type][idx];
-  item.tally = Math.min(MAX_TALLY, Math.max(0, item.tally + delta));
-  saveAll();
-  lastBumped = type + '-' + idx;
-  renderMain();
+function autoGrow(el){
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
 }
 
 function renderList(type, listId, comp){
@@ -797,55 +704,26 @@ function renderList(type, listId, comp){
     const li = document.createElement('li');
     li.className = 'item';
 
-    const fill = document.createElement('div');
-    fill.className = 'weight-fill';
-    fill.style.width = Math.round((item.tally / MAX_TALLY) * 100) + '%';
-    li.appendChild(fill);
-
-    const textInput = document.createElement('input');
-    textInput.className = 'text';
-    textInput.type = 'text';
-    textInput.placeholder = type === 'pros' ? 'Reason for...' : 'Reason against...';
-    textInput.value = item.text;
-    textInput.addEventListener('input', (e) => updateText(type, idx, e.target.value));
-
-    const tallyWrap = document.createElement('div');
-    tallyWrap.className = 'tally';
-
-    const minusBtn = document.createElement('button');
-    minusBtn.textContent = '\u2212';
-    minusBtn.disabled = item.tally <= 0;
-    minusBtn.onclick = () => changeTally(type, idx, -1);
-
-    const marks = document.createElement('span');
-    marks.className = 'tally-marks';
-    marks.textContent = item.tally;
-    if(lastBumped === type + '-' + idx){
-      marks.classList.add('bump');
-      requestAnimationFrame(() => {
-        setTimeout(() => { lastBumped = null; }, 300);
-      });
-    }
-
-    const plusBtn = document.createElement('button');
-    plusBtn.textContent = '+';
-    plusBtn.disabled = item.tally >= MAX_TALLY;
-    plusBtn.title = item.tally >= MAX_TALLY ? `Max weight is ${MAX_TALLY}` : '';
-    plusBtn.onclick = () => changeTally(type, idx, 1);
-
-    tallyWrap.appendChild(minusBtn);
-    tallyWrap.appendChild(marks);
-    tallyWrap.appendChild(plusBtn);
+    const textArea = document.createElement('textarea');
+    textArea.className = 'text';
+    textArea.rows = 1;
+    textArea.placeholder = type === 'pros' ? 'Reason for...' : 'Reason against...';
+    textArea.value = item.text;
+    textArea.addEventListener('input', (e) => {
+      updateText(type, idx, e.target.value);
+      autoGrow(e.target);
+    });
 
     const delBtn = document.createElement('button');
     delBtn.className = 'del';
     delBtn.textContent = '\u00d7';
     delBtn.onclick = () => removeItem(type, idx, li);
 
-    li.appendChild(textInput);
-    li.appendChild(tallyWrap);
+    li.appendChild(textArea);
     li.appendChild(delBtn);
     list.appendChild(li);
+
+    autoGrow(textArea);
   });
 }
 
