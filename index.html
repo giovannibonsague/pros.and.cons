@@ -40,6 +40,45 @@
     --con-light:var(--card);
   }
 
+  /* BLACK & WHITE MODE: pros = black, cons = white */
+  body[data-colors="bw"]{
+    --pro:#000000;
+    --pro-light:#e4e4e2;
+    --con:#ffffff;
+    --con-light:#3a3a38;
+  }
+  body[data-theme="dark"][data-colors="bw"]{
+    --pro-light:#2b2b29;
+    --con-light:#050505;
+  }
+
+  /* cons header (white bg) needs dark text + dark accents, always */
+  body[data-colors="bw"] .col.cons .col-header{ color:#000; }
+  body[data-colors="bw"] .col.cons .add-btn{ background:rgba(0,0,0,.12); color:#000; }
+  body[data-colors="bw"] .col.cons .add-btn:hover{ background:rgba(0,0,0,.22); }
+
+  /* outline black shapes/text when they'd blend into a dark background */
+  body[data-theme="dark"][data-colors="bw"] .col.pros .col-header,
+  body[data-theme="dark"][data-colors="bw"] .score.pro{
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.7);
+  }
+  body[data-theme="dark"][data-colors="bw"] .col.pros .tally-marks,
+  body[data-theme="dark"][data-colors="bw"] .comp-tally .p{
+    -webkit-text-stroke: .5px #fff;
+    text-shadow: 0 0 1px rgba(255,255,255,.8);
+  }
+
+  /* outline white shapes/text when they'd blend into a light background */
+  body[data-theme="light"][data-colors="bw"] .col.cons .col-header,
+  body[data-theme="light"][data-colors="bw"] .score.con{
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.7);
+  }
+  body[data-theme="light"][data-colors="bw"] .col.cons .tally-marks,
+  body[data-theme="light"][data-colors="bw"] .comp-tally .c{
+    -webkit-text-stroke: .5px #000;
+    text-shadow: 0 0 1px rgba(0,0,0,.8);
+  }
+
   *{box-sizing:border-box;}
   html,body{height:100%;}
   body{
@@ -80,7 +119,7 @@
     border-radius:8px;
     border:none;
     background:var(--ink);
-    color:#fff;
+    color:var(--paper);
     font-size:18px;
     cursor:pointer;
     line-height:1;
@@ -271,7 +310,20 @@
     border-radius:10px;
     background:var(--paper);
     border:1px solid var(--line);
+    position:relative;
+    overflow:hidden;
   }
+  .item > *{ position:relative; z-index:1; }
+  .weight-fill{
+    position:absolute;
+    left:0; top:0; bottom:0;
+    width:0%;
+    z-index:0;
+    transition:width .35s cubic-bezier(.4,0,.2,1);
+    pointer-events:none;
+  }
+  .col.pros .weight-fill{ background:var(--pro-light); }
+  .col.cons .weight-fill{ background:var(--con-light); }
   .item input.text{
     flex:1;
     border:none;
@@ -291,6 +343,10 @@
     font-size:14px;
     color:var(--muted);
     white-space:nowrap;
+  }
+  .tally button:disabled{
+    opacity:.35;
+    cursor:not-allowed;
   }
   .tally-marks{
     font-weight:600;
@@ -462,6 +518,7 @@
         <div class="settings-options" id="colorOptions">
           <button class="settings-btn" data-value="on" onclick="setColors('on')">Colors</button>
           <button class="settings-btn" data-value="off" onclick="setColors('off')">No colors</button>
+          <button class="settings-btn" data-value="bw" onclick="setColors('bw')">Black &amp; White</button>
         </div>
       </div>
     </div>
@@ -711,12 +768,13 @@ function updateText(type, idx, val){
   saveAll();
 }
 
+const MAX_TALLY = 10;
 let lastBumped = null;
 
 function changeTally(type, idx, delta){
   const comp = getActive();
   const item = comp[type][idx];
-  item.tally = Math.max(0, item.tally + delta);
+  item.tally = Math.min(MAX_TALLY, Math.max(0, item.tally + delta));
   saveAll();
   lastBumped = type + '-' + idx;
   renderMain();
@@ -739,6 +797,11 @@ function renderList(type, listId, comp){
     const li = document.createElement('li');
     li.className = 'item';
 
+    const fill = document.createElement('div');
+    fill.className = 'weight-fill';
+    fill.style.width = Math.round((item.tally / MAX_TALLY) * 100) + '%';
+    li.appendChild(fill);
+
     const textInput = document.createElement('input');
     textInput.className = 'text';
     textInput.type = 'text';
@@ -751,6 +814,7 @@ function renderList(type, listId, comp){
 
     const minusBtn = document.createElement('button');
     minusBtn.textContent = '\u2212';
+    minusBtn.disabled = item.tally <= 0;
     minusBtn.onclick = () => changeTally(type, idx, -1);
 
     const marks = document.createElement('span');
@@ -765,6 +829,8 @@ function renderList(type, listId, comp){
 
     const plusBtn = document.createElement('button');
     plusBtn.textContent = '+';
+    plusBtn.disabled = item.tally >= MAX_TALLY;
+    plusBtn.title = item.tally >= MAX_TALLY ? `Max weight is ${MAX_TALLY}` : '';
     plusBtn.onclick = () => changeTally(type, idx, 1);
 
     tallyWrap.appendChild(minusBtn);
