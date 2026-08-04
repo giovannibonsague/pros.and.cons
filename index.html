@@ -19,7 +19,7 @@
     --line:#ddd7c9;
     --muted:#8a8570;
     --muted-light:#b6b0a0;
-    --sidebar-w:270px;
+    --sidebar-w:280px;
   }
 
   body[data-theme="dark"]{
@@ -64,33 +64,41 @@
     flex-direction:column;
   }
   .sidebar-header{
-    padding:20px 18px 14px;
+    padding:18px 18px 12px;
     border-bottom:2px solid var(--line);
     display:flex;
     justify-content:space-between;
     align-items:center;
+    gap:8px;
   }
   .sidebar-header h1{
     font-size:16px;
     margin:0;
     letter-spacing:.02em;
   }
-  .new-btn{
+  .header-btns{ display:flex; gap:6px; }
+  .icon-btn{
     width:30px;
     height:30px;
     border-radius:8px;
     border:none;
     background:var(--ink);
     color:var(--paper);
-    font-size:18px;
+    font-size:16px;
     cursor:pointer;
     line-height:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
   }
-  .new-btn:hover{ opacity:.85; }
+  .icon-btn:hover{ opacity:.85; }
+  .icon-btn.secondary{
+    background:var(--paper);
+    color:var(--ink);
+    border:2px solid var(--line);
+  }
 
-  .search-wrap{
-    padding:10px 12px 4px;
-  }
+  .search-wrap{ padding:10px 12px 4px; }
   .search-input{
     width:100%;
     padding:9px 12px;
@@ -127,18 +135,10 @@
     text-transform:uppercase;
     letter-spacing:.06em;
   }
-  .group-header .chev{
-    transition:transform .18s ease;
-    font-size:10px;
-  }
+  .group-header .chev{ transition:transform .18s ease; font-size:10px; }
   .group-header.collapsed .chev{ transform:rotate(-90deg); }
   .group-count{ color:var(--muted-light); font-weight:600; }
-  .group-body{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-    padding-bottom:8px;
-  }
+  .group-body{ display:flex; flex-direction:column; gap:6px; padding-bottom:8px; }
   .group-body.collapsed{ display:none; }
 
   .comp-item{
@@ -149,21 +149,13 @@
     position:relative;
   }
   .comp-item:hover{ background:var(--paper); }
-  .comp-item.active{
-    background:var(--paper);
-    border-color:var(--line);
-  }
-  .comp-item.drag-over{
-    border-color:var(--muted);
-    border-style:dashed;
-  }
+  .comp-item.active{ background:var(--paper); border-color:var(--line); }
+  .comp-item.drag-over{ border-color:var(--muted); border-style:dashed; }
   .comp-item.dragging{ opacity:.4; }
+  .comp-item:focus-visible{ outline:2px solid var(--muted); outline-offset:1px; }
+  .comp-item.archived{ opacity:.7; }
 
-  .comp-top-row{
-    display:flex;
-    align-items:flex-start;
-    gap:6px;
-  }
+  .comp-top-row{ display:flex; align-items:flex-start; gap:6px; }
   .comp-name{
     font-weight:600;
     font-size:14px;
@@ -174,36 +166,18 @@
     min-width:0;
   }
   .comp-name.placeholder{ color:var(--muted-light); font-weight:400; }
-  .comp-tally{
-    font-size:12px;
-    color:var(--muted);
-    margin-top:3px;
-  }
+  .comp-tally{ font-size:12px; color:var(--muted); margin-top:3px; }
   .comp-tally .p{ color:var(--pro); font-weight:600; }
   .comp-tally .c{ color:var(--con); font-weight:600; }
-
-  .comp-actions{
-    position:absolute;
-    top:6px;
-    right:6px;
-    display:none;
-    gap:2px;
+  .comp-confidence{
+    font-size:11px;
+    font-style:italic;
+    color:var(--muted);
+    margin-top:4px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
   }
-  .comp-item:hover .comp-actions{ display:flex; }
-  .comp-actions button{
-    border:none;
-    background:transparent;
-    color:var(--muted-light);
-    font-size:14px;
-    cursor:pointer;
-    width:22px;
-    height:22px;
-    border-radius:6px;
-    line-height:1;
-  }
-  .comp-actions button:hover{ background:var(--line); color:var(--ink); }
-  .comp-actions button.pin-btn.pinned{ color:var(--ink); }
-  .comp-actions button.del-btn:hover{ color:var(--con); background:var(--con-light); }
 
   .comp-folder-input{
     margin-top:6px;
@@ -220,42 +194,74 @@
   .comp-folder-input:focus{ border-bottom-color:var(--muted); }
   .comp-folder-input::placeholder{ color:var(--muted-light); }
 
-  .no-results{
-    text-align:center;
+  .comp-actions{ position:absolute; top:6px; right:6px; }
+  .kebab-btn{
+    border:none;
+    background:transparent;
     color:var(--muted-light);
-    font-size:13px;
-    padding:24px 10px;
+    font-size:16px;
+    cursor:pointer;
+    width:22px;
+    height:22px;
+    border-radius:6px;
+    line-height:1;
+    display:none;
   }
+  .comp-item:hover .kebab-btn, .kebab-btn.open{ display:block; }
+  .kebab-btn:hover{ background:var(--line); color:var(--ink); }
+
+  .kebab-menu{
+    position:absolute;
+    top:26px;
+    right:0;
+    background:var(--card);
+    border:2px solid var(--line);
+    border-radius:10px;
+    box-shadow:0 8px 24px rgba(0,0,0,.15);
+    z-index:20;
+    min-width:140px;
+    overflow:hidden;
+    display:none;
+  }
+  .kebab-menu.open{ display:block; }
+  .kebab-menu button{
+    display:block;
+    width:100%;
+    text-align:left;
+    padding:9px 12px;
+    border:none;
+    background:transparent;
+    color:var(--ink);
+    font-family:inherit;
+    font-size:12.5px;
+    cursor:pointer;
+  }
+  .kebab-menu button:hover{ background:var(--paper); }
+  .kebab-menu button.danger:hover{ background:var(--con-light); color:var(--con); }
+  .kebab-menu button.starred{ color:var(--ink); font-weight:700; }
+
+  .no-results{ text-align:center; color:var(--muted-light); font-size:13px; padding:24px 10px; }
 
   .sidebar-footer{
-    padding:12px 18px;
+    padding:10px 18px;
     font-size:11px;
     color:var(--muted-light);
     border-top:1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+    gap:4px;
   }
+  .backup-nudge{ color:var(--con); }
 
   /* MAIN */
-  .main{
-    flex:1;
-    padding:32px 40px 80px;
-    max-width:900px;
-  }
-  .no-selection{
-    text-align:center;
-    color:var(--muted-light);
-    margin-top:120px;
-    font-size:16px;
-  }
+  .main{ flex:1; padding:32px 40px 80px; max-width:900px; }
+  .no-selection{ text-align:center; color:var(--muted-light); margin-top:120px; font-size:16px; }
 
-  .title-row{
-    display:flex;
-    align-items:flex-start;
-    gap:14px;
-    margin-bottom:8px;
-  }
+  .title-row{ display:flex; align-items:flex-start; gap:10px; margin-bottom:6px; flex-wrap:wrap; }
   #mainThing{
     flex:1;
-    font-size:clamp(26px, 4vw, 38px);
+    min-width:200px;
+    font-size:clamp(24px, 4vw, 36px);
     font-weight:700;
     background:transparent;
     border:none;
@@ -266,14 +272,11 @@
     width:100%;
     font-family:inherit;
   }
-  #mainThing:hover, #mainThing:focus{
-    border-bottom:3px solid var(--line);
-  }
+  #mainThing:hover, #mainThing:focus{ border-bottom:3px solid var(--line); }
   #mainThing::placeholder{ color:var(--muted-light); }
 
-  .print-btn{
-    flex-shrink:0;
-    margin-top:8px;
+  .title-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+  .ghost-btn{
     padding:8px 14px;
     border-radius:9px;
     border:2px solid var(--line);
@@ -285,300 +288,197 @@
     cursor:pointer;
     white-space:nowrap;
   }
-  .print-btn:hover{ border-color:var(--muted); }
+  .ghost-btn:hover{ border-color:var(--muted); }
 
-  .subtitle{
+  .confidence-row{ margin-bottom:18px; }
+  .confidence-input{
+    width:100%;
+    padding:9px 12px;
+    border-radius:9px;
+    border:1.5px dashed var(--line);
+    background:transparent;
     color:var(--muted);
+    font-family:inherit;
     font-size:13px;
-    margin-bottom:26px;
-    letter-spacing:.02em;
+    font-style:italic;
+    outline:none;
   }
+  .confidence-input:focus{ border-style:solid; border-color:var(--muted); color:var(--ink); }
+  .confidence-input::placeholder{ color:var(--muted-light); }
 
-  .scoreboard{
-    display:flex;
-    gap:16px;
-    margin-bottom:28px;
-    flex-wrap:wrap;
-  }
+  .subtitle{ color:var(--muted); font-size:13px; margin-bottom:22px; letter-spacing:.02em; }
+
+  .scoreboard{ display:flex; gap:16px; margin-bottom:28px; flex-wrap:wrap; }
   .score{
-    padding:10px 22px;
-    border-radius:14px;
-    font-weight:700;
-    font-size:17px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    border:2px solid;
+    padding:10px 22px; border-radius:14px; font-weight:700; font-size:17px;
+    display:flex; align-items:center; gap:8px; border:2px solid;
   }
   .score.pro{ background:var(--pro-light); border-color:var(--pro); color:var(--pro); }
   .score.con{ background:var(--con-light); border-color:var(--con); color:var(--con); }
   .score .num{ font-size:24px; }
-  .winner{
-    font-size:13px;
-    color:var(--muted);
-    margin:-18px 0 26px;
-    min-height:16px;
-  }
+  .winner{ font-size:13px; color:var(--muted); margin:-18px 0 26px; min-height:16px; }
 
-  .columns{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:20px;
-  }
-  @media (max-width:640px){
-    .columns{grid-template-columns:1fr;}
-  }
+  .columns{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:640px){ .columns{ grid-template-columns:1fr; } }
 
-  .col{
-    background:var(--card);
-    border-radius:18px;
-    border:2px solid var(--line);
-    overflow:hidden;
-    display:flex;
-    flex-direction:column;
-  }
-  .col-header{
-    padding:14px 18px;
-    font-weight:700;
-    font-size:18px;
-    color:#fff;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-  }
+  .col{ background:var(--card); border-radius:18px; border:2px solid var(--line); overflow:hidden; display:flex; flex-direction:column; }
+  .col-header{ padding:14px 18px; font-weight:700; font-size:18px; color:#fff; display:flex; justify-content:space-between; align-items:center; }
   .col.pros .col-header{ background:var(--pro); }
   .col.cons .col-header{ background:var(--con); }
 
   .add-btn{
-    background:rgba(255,255,255,.25);
-    border:none;
-    color:#fff;
-    width:30px;
-    height:30px;
-    border-radius:8px;
-    font-size:19px;
-    cursor:pointer;
-    line-height:1;
+    background:rgba(255,255,255,.25); border:none; color:#fff;
+    width:30px; height:30px; border-radius:8px; font-size:19px; cursor:pointer; line-height:1;
   }
   .add-btn:hover{ background:rgba(255,255,255,.4); }
 
-  .items{
-    list-style:none;
-    margin:0;
-    padding:14px;
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-    min-height:70px;
+  .items{ list-style:none; margin:0; padding:14px; display:flex; flex-direction:column; gap:8px; min-height:70px; }
+
+  .category-header{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    font-weight:700;
+    color:var(--muted);
+    padding:8px 2px 0;
   }
+  .category-header:first-child{ padding-top:0; }
 
   .item{
-    display:flex;
-    align-items:flex-start;
-    gap:8px;
-    padding:10px 10px;
-    border-radius:10px;
-    background:var(--paper);
-    border:1px solid var(--line);
-    position:relative;
+    display:flex; align-items:flex-start; gap:8px; padding:10px 10px;
+    border-radius:10px; background:var(--paper); border:1px solid var(--line); position:relative;
   }
-  .item.drag-over{
-    border-color:var(--muted);
-    border-style:dashed;
-  }
+  .item.drag-over{ border-color:var(--muted); border-style:dashed; }
   .item.dragging{ opacity:.35; }
 
   .drag-handle{
-    flex-shrink:0;
-    cursor:grab;
-    color:var(--muted-light);
-    font-size:14px;
-    line-height:1.4;
-    padding-top:2px;
-    letter-spacing:-2px;
-    user-select:none;
+    flex-shrink:0; cursor:grab; color:var(--muted-light); font-size:14px;
+    line-height:1.4; padding-top:2px; letter-spacing:-2px; user-select:none;
   }
   .drag-handle:active{ cursor:grabbing; }
 
-  .item textarea.text{
-    flex:1;
-    border:none;
-    background:transparent;
-    font-family:inherit;
-    font-size:14px;
-    color:var(--ink);
-    outline:none;
-    min-width:0;
-    resize:none;
-    overflow:hidden;
-    line-height:1.4;
-    padding:2px 0;
-    min-height:20px;
-    transition:height .15s ease;
-  }
-  .item textarea.text::placeholder{ color:var(--muted-light); }
+  .item-body{ flex:1; min-width:0; }
 
-  .del{
+  .item .text{
+    flex:1; font-family:inherit; font-size:14px; color:var(--ink);
+    outline:none; min-width:0; line-height:1.4; padding:2px 0; min-height:20px;
+    white-space:pre-wrap; word-break:break-word;
+  }
+  .item .text:empty::before{ content:attr(data-placeholder); color:var(--muted-light); }
+  .item .text a{ color:inherit; text-decoration:underline; text-decoration-color:var(--muted-light); }
+
+  .item-category-input{
+    margin-top:4px;
+    width:100%;
     border:none;
     background:transparent;
-    color:var(--muted-light);
-    cursor:pointer;
-    font-size:16px;
-    width:20px;
-    margin-top:1px;
+    border-bottom:1px dashed var(--line);
+    font-family:inherit;
+    font-size:11px;
+    color:var(--muted);
+    padding:1px 0;
+    outline:none;
   }
+  .item-category-input:focus{ border-bottom-color:var(--muted); }
+  .item-category-input::placeholder{ color:var(--muted-light); }
+
+  .del{ border:none; background:transparent; color:var(--muted-light); cursor:pointer; font-size:16px; width:20px; margin-top:1px; }
   .del:hover{ color:var(--con); }
 
-  .empty-hint{
-    text-align:center;
-    color:var(--muted-light);
-    font-size:13px;
-    padding:10px;
-  }
+  .empty-hint{ text-align:center; color:var(--muted-light); font-size:13px; padding:10px; }
 
   /* ANIMATIONS */
-  @keyframes slideIn{
-    from{ opacity:0; transform:translateY(-8px) scale(.98); }
-    to{ opacity:1; transform:translateY(0) scale(1); }
-  }
-  @keyframes slideOut{
-    from{ opacity:1; transform:translateX(0); max-height:60px; margin-bottom:8px; }
-    to{ opacity:0; transform:translateX(12px); max-height:0; margin-bottom:0; padding-top:0; padding-bottom:0; }
-  }
-  @keyframes fadeSlide{
-    from{ opacity:0; transform:translateY(6px); }
-    to{ opacity:1; transform:translateY(0); }
-  }
-  @keyframes toastIn{
-    from{ opacity:0; transform:translate(-50%, 12px); }
-    to{ opacity:1; transform:translate(-50%, 0); }
-  }
+  @keyframes slideIn{ from{ opacity:0; transform:translateY(-8px) scale(.98); } to{ opacity:1; transform:translateY(0) scale(1); } }
+  @keyframes slideOut{ from{ opacity:1; transform:translateX(0); max-height:80px; margin-bottom:8px; } to{ opacity:0; transform:translateX(12px); max-height:0; margin-bottom:0; padding-top:0; padding-bottom:0; } }
+  @keyframes fadeSlide{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes toastIn{ from{ opacity:0; transform:translate(-50%, 12px); } to{ opacity:1; transform:translate(-50%, 0); } }
+  @keyframes modalIn{ from{ opacity:0; transform:scale(.97); } to{ opacity:1; transform:scale(1); } }
 
   .item{ animation:slideIn .22s ease; transition:background .2s ease, border-color .2s ease; }
   .item.removing{ animation:slideOut .2s ease forwards; overflow:hidden; }
 
-  .col, .comp-item, .score, #mainThing, .new-btn, .add-btn, .del, .comp-actions button{
+  .col, .comp-item, .score, #mainThing, .icon-btn, .add-btn, .del, .kebab-btn{
     transition:background .2s ease, border-color .2s ease, color .2s ease, transform .15s ease, box-shadow .2s ease;
   }
-  .add-btn:active, .new-btn:active{ transform:scale(.88); }
+  .add-btn:active, .icon-btn:active{ transform:scale(.88); }
   .comp-item{ animation:fadeSlide .2s ease; }
-
   .content-fade{ animation:fadeSlide .25s ease; }
 
   /* TOAST */
   .toast{
-    position:fixed;
-    left:50%;
-    bottom:26px;
-    transform:translateX(-50%);
-    background:var(--ink);
-    color:var(--paper);
-    padding:12px 16px;
-    border-radius:12px;
-    font-size:13px;
-    display:flex;
-    align-items:center;
-    gap:14px;
-    box-shadow:0 8px 24px rgba(0,0,0,.2);
-    animation:toastIn .2s ease;
-    z-index:50;
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%);
+    background:var(--ink); color:var(--paper); padding:12px 16px; border-radius:12px;
+    font-size:13px; display:flex; align-items:center; gap:14px;
+    box-shadow:0 8px 24px rgba(0,0,0,.2); animation:toastIn .2s ease; z-index:60;
   }
-  .toast button{
-    border:none;
-    background:var(--paper);
-    color:var(--ink);
-    font-family:inherit;
-    font-weight:700;
-    font-size:12px;
-    padding:6px 12px;
-    border-radius:7px;
-    cursor:pointer;
-  }
+  .toast button{ border:none; background:var(--paper); color:var(--ink); font-family:inherit; font-weight:700; font-size:12px; padding:6px 12px; border-radius:7px; cursor:pointer; }
   .toast.error{ background:var(--con); }
   .toast.error button{ color:var(--con); }
 
   /* SETTINGS */
-  .settings-wrap{
-    border-top:1px solid var(--line);
-    padding:10px;
-  }
+  .settings-wrap{ border-top:1px solid var(--line); padding:10px; }
   .settings-toggle{
-    width:100%;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:10px 12px;
-    background:transparent;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    color:var(--ink);
-    font-family:inherit;
-    font-size:13px;
-    font-weight:600;
+    width:100%; display:flex; align-items:center; justify-content:space-between;
+    padding:10px 12px; background:transparent; border:none; border-radius:8px; cursor:pointer;
+    color:var(--ink); font-family:inherit; font-size:13px; font-weight:600;
   }
   .settings-toggle:hover{ background:var(--paper); }
-  .settings-toggle .chev{
-    transition:transform .2s ease;
-    color:var(--muted);
-  }
+  .settings-toggle .chev{ transition:transform .2s ease; color:var(--muted); }
   .settings-toggle.open .chev{ transform:rotate(180deg); }
 
-  .settings-panel{
-    max-height:0;
-    overflow:hidden;
-    transition:max-height .25s ease;
-  }
-  .settings-panel.open{ max-height:280px; }
+  .settings-panel{ max-height:0; overflow:hidden; transition:max-height .3s ease; }
+  .settings-panel.open{ max-height:480px; }
 
-  .settings-group{
-    padding:10px 12px 4px;
-  }
-  .settings-label{
-    font-size:11px;
-    text-transform:uppercase;
-    letter-spacing:.06em;
-    color:var(--muted);
-    margin-bottom:8px;
-    font-weight:600;
-  }
-  .settings-options{
-    display:flex;
-    gap:6px;
-    flex-wrap:wrap;
-    margin-bottom:14px;
-  }
+  .settings-group{ padding:10px 12px 4px; }
+  .settings-label{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:8px; font-weight:600; }
+  .settings-options{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
   .settings-btn{
-    flex:1;
-    min-width:70px;
-    padding:8px 6px;
-    border-radius:8px;
-    border:2px solid var(--line);
-    background:var(--card);
-    color:var(--ink);
-    font-family:inherit;
-    font-size:12px;
-    font-weight:600;
-    cursor:pointer;
+    flex:1; min-width:70px; padding:8px 6px; border-radius:8px; border:2px solid var(--line);
+    background:var(--card); color:var(--ink); font-family:inherit; font-size:12px; font-weight:600; cursor:pointer;
   }
   .settings-btn:hover{ border-color:var(--muted); }
-  .settings-btn.active{
-    border-color:var(--ink);
-    background:var(--ink);
-    color:var(--paper);
+  .settings-btn.active{ border-color:var(--ink); background:var(--ink); color:var(--paper); }
+
+  .data-row{ display:flex; gap:6px; margin-bottom:8px; }
+  .data-row .ghost-btn{ flex:1; padding:8px 6px; font-size:12px; text-align:center; }
+  #importFileInput{ display:none; }
+
+  /* COMPARE MODAL */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:70;
+    display:flex; align-items:center; justify-content:center; padding:24px;
   }
+  .modal-card{
+    background:var(--paper); border-radius:20px; max-width:1100px; width:100%;
+    max-height:90vh; overflow-y:auto; padding:26px 30px 34px; animation:modalIn .18s ease;
+  }
+  .modal-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+  .modal-header h2{ margin:0; font-size:20px; }
+  .modal-close{ border:none; background:transparent; color:var(--muted); font-size:22px; cursor:pointer; line-height:1; }
+  .modal-close:hover{ color:var(--ink); }
+
+  .compare-pickers{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:22px; }
+  .compare-pickers select{
+    width:100%; padding:9px 12px; border-radius:9px; border:2px solid var(--line);
+    background:var(--card); color:var(--ink); font-family:inherit; font-size:13px;
+  }
+  .compare-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:760px){ .compare-grid, .compare-pickers{ grid-template-columns:1fr; } }
+  .compare-side h3{ font-size:17px; margin:0 0 4px; }
+  .compare-side .comp-confidence{ font-size:12px; margin-bottom:10px; }
+
+  .empty-hint{ text-align:center; color:var(--muted-light); font-size:13px; padding:10px; }
 
   /* PRINT */
   @media print{
-    .sidebar, .print-btn, .add-btn, .del, .drag-handle, .toast, .no-selection{ display:none !important; }
+    .sidebar, .title-actions, .add-btn, .del, .drag-handle, .toast, .no-selection, .item-category-input, .modal-overlay{ display:none !important; }
     body{ display:block; background:#fff; color:#000; }
     .main{ max-width:100%; padding:0; }
     #mainThing{ border:none; color:#000; }
     .col{ border:1px solid #999; break-inside:avoid; }
     .item{ border:1px solid #ccc; background:#fff; }
-    .item textarea.text{ color:#000; }
-    .col-header{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-    .score.pro, .score.con{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .item .text{ color:#000; }
+    .col-header, .score.pro, .score.con{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   }
 </style>
 </head>
@@ -587,7 +487,10 @@
 <div class="sidebar">
   <div class="sidebar-header">
     <h1>Comparisons</h1>
-    <button class="new-btn" onclick="newComparison()" title="New comparison (Ctrl/Cmd+N)">+</button>
+    <div class="header-btns">
+      <button class="icon-btn secondary" onclick="openCompareModal()" title="Compare two side by side">&#8646;</button>
+      <button class="icon-btn" onclick="newComparison()" title="New comparison (Ctrl/Cmd+N)">+</button>
+    </div>
   </div>
 
   <div class="search-wrap">
@@ -598,7 +501,7 @@
 
   <div class="settings-wrap">
     <button class="settings-toggle" id="settingsToggle" onclick="toggleSettings()">
-      Settings
+      Settings & data
       <span class="chev">&#9662;</span>
     </button>
     <div class="settings-panel" id="settingsPanel">
@@ -614,11 +517,20 @@
           <button class="settings-btn" data-value="on" onclick="setColors('on')">Colors</button>
           <button class="settings-btn" data-value="off" onclick="setColors('off')">No colors</button>
         </div>
+        <div class="settings-label">Data</div>
+        <div class="data-row">
+          <button class="ghost-btn" onclick="exportAll()">Export all (JSON)</button>
+          <button class="ghost-btn" onclick="document.getElementById('importFileInput').click()">Import</button>
+        </div>
+        <input type="file" id="importFileInput" accept="application/json">
       </div>
     </div>
   </div>
 
-  <div class="sidebar-footer">Stored locally in this browser</div>
+  <div class="sidebar-footer">
+    <span>Stored on this device (IndexedDB, with local-storage fallback)</span>
+    <span id="backupNudge"></span>
+  </div>
 </div>
 
 <div class="main" id="main">
@@ -627,9 +539,18 @@
   <div id="content" class="content-fade" style="display:none;">
     <div class="title-row">
       <input id="mainThing" type="text" placeholder="What are you deciding?" />
-      <button class="print-btn" onclick="window.print()">Print / Export PDF</button>
+      <div class="title-actions">
+        <button class="ghost-btn" onclick="window.print()">Print / PDF</button>
+        <button class="ghost-btn" onclick="exportMarkdown()">Export as Markdown</button>
+        <button class="ghost-btn" onclick="duplicateActive()">Duplicate</button>
+      </div>
     </div>
-    <div class="subtitle">changes save automatically &middot; Enter adds a new item, Esc unfocuses</div>
+
+    <div class="confidence-row">
+      <input id="confidenceInput" class="confidence-input" type="text" placeholder="Where are you leaning? (e.g. leaning toward yes)" />
+    </div>
+
+    <div class="subtitle">changes save automatically &middot; Enter adds a new item &middot; Alt+&#8593;/&#8595; moves between items &middot; **bold** and *italic* supported</div>
 
     <div class="scoreboard">
       <div class="score pro"><span class="num" id="proCount">0</span> Pros</div>
@@ -639,56 +560,139 @@
 
     <div class="columns">
       <div class="col pros">
-        <div class="col-header">
-          Pros
-          <button class="add-btn" onclick="addItem('pros')">+</button>
-        </div>
+        <div class="col-header">Pros<button class="add-btn" onclick="addItem('pros')">+</button></div>
         <ul class="items" id="prosList"></ul>
       </div>
       <div class="col cons">
-        <div class="col-header">
-          Cons
-          <button class="add-btn" onclick="addItem('cons')">+</button>
-        </div>
+        <div class="col-header">Cons<button class="add-btn" onclick="addItem('cons')">+</button></div>
         <ul class="items" id="consList"></ul>
       </div>
     </div>
   </div>
 </div>
 
+<div id="compareModalRoot"></div>
+
 <script>
-const STORAGE_KEY = 'prosConsComparisons';
-const ACTIVE_KEY = 'prosConsActiveId';
-const SETTINGS_KEY = 'prosConsSettings';
+/* =========================================================
+   STORAGE LAYER — IndexedDB primary, localStorage fallback
+   ========================================================= */
+const DB_NAME = 'prosConsDB';
+const DB_STORE = 'kv';
+const K_DATA = 'prosConsComparisons';
+const K_ACTIVE = 'prosConsActiveId';
+const K_SETTINGS = 'prosConsSettings';
+const K_LAST_EXPORT = 'prosConsLastExport';
 
-/* ---------- storage helpers (with quota-safe writes) ---------- */
-
-function safeSet(key, value){
-  try{
-    localStorage.setItem(key, value);
-    return true;
-  }catch(e){
-    showToast('Couldn\'t save — storage might be full.', { error:true });
-    return false;
-  }
+let dbPromise = null;
+function openDB(){
+  if(dbPromise) return dbPromise;
+  dbPromise = new Promise((resolve) => {
+    if(!window.indexedDB){ resolve(null); return; }
+    try{
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = () => {
+        req.result.createObjectStore(DB_STORE, { keyPath:'key' });
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+    }catch(e){ resolve(null); }
+  });
+  return dbPromise;
 }
 
-/* ---------- settings ---------- */
-
-function loadSettings(){
-  try{
-    const raw = localStorage.getItem(SETTINGS_KEY);
-    if(raw) return Object.assign({ theme:'system', colors:'on', collapsedFolders:[] }, JSON.parse(raw));
-  }catch(e){}
-  return { theme:'system', colors:'on', collapsedFolders:[] };
+async function idbGet(key){
+  const db = await openDB();
+  if(!db) return undefined;
+  return new Promise((resolve) => {
+    try{
+      const tx = db.transaction(DB_STORE, 'readonly');
+      const req = tx.objectStore(DB_STORE).get(key);
+      req.onsuccess = () => resolve(req.result ? req.result.value : undefined);
+      req.onerror = () => resolve(undefined);
+    }catch(e){ resolve(undefined); }
+  });
 }
 
-let settings = loadSettings();
-
-function saveSettings(){
-  safeSet(SETTINGS_KEY, JSON.stringify(settings));
+async function idbSet(key, value){
+  const db = await openDB();
+  if(!db) return false;
+  return new Promise((resolve) => {
+    try{
+      const tx = db.transaction(DB_STORE, 'readwrite');
+      tx.objectStore(DB_STORE).put({ key, value });
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+    }catch(e){ resolve(false); }
+  });
 }
 
+// unified storage: try IndexedDB, fall back to localStorage. Fire-and-forget for writes.
+function persist(key, value){
+  idbSet(key, value).then(ok => {
+    if(!ok){
+      try{ localStorage.setItem(key, value); }
+      catch(e){ showToast("Couldn't save — storage might be full.", { error:true }); }
+    }
+  });
+  // always mirror to localStorage too as a cheap belt-and-suspenders fallback,
+  // unless the value is too large (quota) — failure here is silent/non-fatal
+  try{ localStorage.setItem(key, value); }catch(e){ /* ignore, IDB already attempted */ }
+}
+
+async function loadKey(key){
+  const idbVal = await idbGet(key);
+  if(idbVal !== undefined) return idbVal;
+  try{ return localStorage.getItem(key); }catch(e){ return null; }
+}
+
+/* =========================================================
+   STATE
+   ========================================================= */
+let comparisons = [];
+let activeId = null;
+let settings = { theme:'system', colors:'on', collapsedFolders:[], showArchived:false };
+let searchQuery = '';
+let compareModalOpen = false;
+
+function genId(){ return 'i' + Date.now() + Math.random().toString(36).slice(2,7); }
+
+function migrate(list){
+  (list || []).forEach(c => {
+    if(c.folder === undefined) c.folder = '';
+    if(c.pinned === undefined) c.pinned = false;
+    if(c.archived === undefined) c.archived = false;
+    if(c.confidence === undefined) c.confidence = '';
+    ['pros','cons'].forEach(type => {
+      (c[type] || []).forEach(item => {
+        if(!item.id) item.id = genId();
+        if(item.category === undefined) item.category = '';
+      });
+    });
+  });
+  return list || [];
+}
+
+/* =========================================================
+   SAVE (debounced write, immediate in-memory update)
+   ========================================================= */
+let saveTimer = null;
+function scheduleSave(){
+  if(saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => { saveTimer = null; saveAllNow(); }, 400);
+}
+function flushSave(){
+  if(saveTimer){ clearTimeout(saveTimer); saveTimer = null; }
+  saveAllNow();
+}
+function saveAllNow(){ persist(K_DATA, JSON.stringify(comparisons)); }
+function saveActive(){ if(activeId) persist(K_ACTIVE, activeId); }
+function saveSettings(){ persist(K_SETTINGS, JSON.stringify(settings)); }
+window.addEventListener('beforeunload', flushSave);
+
+/* =========================================================
+   THEME / COLOR SETTINGS
+   ========================================================= */
 function applySettings(){
   const body = document.body;
   let effectiveTheme = settings.theme;
@@ -697,111 +701,30 @@ function applySettings(){
   }
   body.setAttribute('data-theme', effectiveTheme);
   body.setAttribute('data-colors', settings.colors);
-
-  document.querySelectorAll('#themeOptions .settings-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.value === settings.theme);
-  });
-  document.querySelectorAll('#colorOptions .settings-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.value === settings.colors);
-  });
+  document.querySelectorAll('#themeOptions .settings-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.value === settings.theme));
+  document.querySelectorAll('#colorOptions .settings-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.value === settings.colors));
 }
-
-function setTheme(value){
-  settings.theme = value;
-  saveSettings();
-  applySettings();
-}
-
-function setColors(value){
-  settings.colors = value;
-  saveSettings();
-  applySettings();
-}
-
+function setTheme(v){ settings.theme = v; saveSettings(); applySettings(); }
+function setColors(v){ settings.colors = v; saveSettings(); applySettings(); }
 function toggleSettings(){
-  const panel = document.getElementById('settingsPanel');
-  const toggle = document.getElementById('settingsToggle');
-  panel.classList.toggle('open');
-  toggle.classList.toggle('open');
+  document.getElementById('settingsPanel').classList.toggle('open');
+  document.getElementById('settingsToggle').classList.toggle('open');
 }
-
 if(window.matchMedia){
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    if(settings.theme === 'system') applySettings();
-  });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if(settings.theme === 'system') applySettings(); });
 }
-
-function isFolderCollapsed(name){
-  return settings.collapsedFolders.includes(name);
-}
+function isFolderCollapsed(name){ return settings.collapsedFolders.includes(name); }
 function toggleFolderCollapsed(name){
   const i = settings.collapsedFolders.indexOf(name);
-  if(i === -1) settings.collapsedFolders.push(name);
-  else settings.collapsedFolders.splice(i,1);
+  if(i === -1) settings.collapsedFolders.push(name); else settings.collapsedFolders.splice(i,1);
   saveSettings();
   renderSidebar();
 }
 
-/* ---------- data ---------- */
-
-function loadAll(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw) return JSON.parse(raw);
-  }catch(e){}
-  return [];
-}
-
-let comparisons = loadAll();
-let activeId = localStorage.getItem(ACTIVE_KEY) || null;
-let searchQuery = '';
-
-// migrate older records: ensure ids on items, folder/pinned fields exist
-comparisons.forEach(c => {
-  if(c.folder === undefined) c.folder = '';
-  if(c.pinned === undefined) c.pinned = false;
-  ['pros','cons'].forEach(type => {
-    (c[type] || []).forEach(item => {
-      if(!item.id) item.id = genId();
-    });
-  });
-});
-
-function saveAllNow(){
-  safeSet(STORAGE_KEY, JSON.stringify(comparisons));
-}
-
-// debounced save so rapid keystrokes don't hammer localStorage
-let saveTimer = null;
-function scheduleSave(){
-  if(saveTimer) clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    saveTimer = null;
-    saveAllNow();
-  }, 400);
-}
-function flushSave(){
-  if(saveTimer){
-    clearTimeout(saveTimer);
-    saveTimer = null;
-  }
-  saveAllNow();
-}
-window.addEventListener('beforeunload', flushSave);
-
-function saveActive(){
-  if(activeId) safeSet(ACTIVE_KEY, activeId);
-}
-
-function genId(){
-  return 'i' + Date.now() + Math.random().toString(36).slice(2,7);
-}
-
-/* ---------- toast / undo ---------- */
-
-let toastEl = null;
-let toastTimer = null;
-
+/* =========================================================
+   TOAST / UNDO
+   ========================================================= */
+let toastEl = null, toastTimer = null;
 function showToast(message, opts){
   opts = opts || {};
   hideToast();
@@ -813,118 +736,141 @@ function showToast(message, opts){
   if(opts.onUndo){
     const btn = document.createElement('button');
     btn.textContent = 'Undo';
-    btn.onclick = () => {
-      opts.onUndo();
-      hideToast();
-    };
+    btn.onclick = () => { opts.onUndo(); hideToast(); };
     toastEl.appendChild(btn);
   }
   document.body.appendChild(toastEl);
   toastTimer = setTimeout(hideToast, opts.error ? 3500 : 6000);
 }
-
 function hideToast(){
   if(toastTimer){ clearTimeout(toastTimer); toastTimer = null; }
   if(toastEl){ toastEl.remove(); toastEl = null; }
 }
 
-/* ---------- comparisons ---------- */
+/* =========================================================
+   MARKDOWN-LITE (bold, italic, auto-link) — text is escaped first
+   ========================================================= */
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s == null ? '' : s;
+  return d.innerHTML;
+}
+function renderMarkdownLite(raw){
+  let html = escapeHtml(raw);
+  html = html.replace(/\*\*([^\*\n]+)\*\*/g, '<b>$1</b>');
+  html = html.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<i>$2</i>');
+  html = html.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+  return html;
+}
 
+/* =========================================================
+   COMPARISON CRUD
+   ========================================================= */
 function newComparison(){
-  const comp = { id: genId(), title:'', folder:'', pinned:false, pros:[], cons:[] };
+  const comp = { id:genId(), title:'', folder:'', pinned:false, archived:false, confidence:'', pros:[], cons:[] };
   comparisons.unshift(comp);
   activeId = comp.id;
-  flushSave();
-  saveActive();
-  renderSidebar();
-  renderMain();
+  flushSave(); saveActive();
+  renderSidebar(); renderMain();
   requestAnimationFrame(() => document.getElementById('mainThing').focus());
+}
+
+function duplicateActive(){
+  const comp = getActive();
+  if(!comp) return;
+  duplicateFrom(comp.id);
 }
 
 function selectComparison(id){
   flushSave();
   activeId = id;
   saveActive();
-  renderSidebar();
-  renderMain();
+  closeAllKebabs();
+  renderSidebar(); renderMain();
 }
 
-function deleteComparison(id, evt){
-  evt.stopPropagation();
+function archiveComparison(id){
+  const comp = comparisons.find(c => c.id === id);
+  if(!comp) return;
+  comp.archived = true;
+  if(activeId === id){ activeId = comparisons.find(c => !c.archived)?.id || null; saveActive(); }
+  flushSave();
+  closeAllKebabs();
+  renderSidebar(); renderMain();
+  showToast('Comparison archived.', {
+    onUndo: () => { comp.archived = false; flushSave(); renderSidebar(); renderMain(); }
+  });
+}
+function restoreComparison(id){
+  const comp = comparisons.find(c => c.id === id);
+  if(!comp) return;
+  comp.archived = false;
+  flushSave();
+  closeAllKebabs();
+  renderSidebar(); renderMain();
+}
+function deleteForever(id, evt){
+  if(evt) evt.stopPropagation();
   const idx = comparisons.findIndex(c => c.id === id);
   if(idx === -1) return;
   const removed = comparisons[idx];
   comparisons.splice(idx, 1);
-  if(activeId === id){
-    activeId = comparisons.length ? comparisons[0].id : null;
-    saveActive();
-  }
+  if(activeId === id){ activeId = comparisons.find(c => !c.archived)?.id || null; saveActive(); }
   flushSave();
-  renderSidebar();
-  renderMain();
-
-  showToast('Comparison deleted.', {
-    onUndo: () => {
-      comparisons.splice(idx, 0, removed);
-      activeId = removed.id;
-      saveActive();
-      flushSave();
-      renderSidebar();
-      renderMain();
-    }
+  closeAllKebabs();
+  renderSidebar(); renderMain();
+  showToast('Deleted permanently.', {
+    onUndo: () => { comparisons.splice(idx, 0, removed); flushSave(); renderSidebar(); renderMain(); }
   });
 }
 
-function togglePin(id, evt){
-  evt.stopPropagation();
+function togglePin(id){
   const comp = comparisons.find(c => c.id === id);
   if(!comp) return;
   comp.pinned = !comp.pinned;
   flushSave();
+  closeAllKebabs();
   renderSidebar();
 }
-
 function updateFolder(id, value){
   const comp = comparisons.find(c => c.id === id);
   if(!comp) return;
   comp.folder = value.trim();
   scheduleSave();
 }
+function getActive(){ return comparisons.find(c => c.id === activeId) || null; }
 
-function getActive(){
-  return comparisons.find(c => c.id === activeId) || null;
-}
-
-/* ---------- sidebar: search, grouping, drag-reorder ---------- */
-
+/* =========================================================
+   SIDEBAR: search, groups, kebab menu, drag-reorder
+   ========================================================= */
 let draggedCompId = null;
+let openKebabId = null;
+
+function closeAllKebabs(){ openKebabId = null; }
 
 function renderSidebar(){
   const list = document.getElementById('comparisonList');
   list.innerHTML = '';
 
   const q = searchQuery.trim().toLowerCase();
-  const visible = q
-    ? comparisons.filter(c => (c.title || 'untitled').toLowerCase().includes(q) || (c.folder || '').toLowerCase().includes(q))
-    : comparisons;
+  const matches = c => !q || (c.title || 'untitled').toLowerCase().includes(q) || (c.folder || '').toLowerCase().includes(q);
+
+  const active = comparisons.filter(c => !c.archived && matches(c));
+  const archived = comparisons.filter(c => c.archived && matches(c));
 
   if(comparisons.length === 0){
-    const hint = document.createElement('div');
-    hint.className = 'no-results';
-    hint.textContent = 'No comparisons yet. Click + to start one.';
-    list.appendChild(hint);
+    list.innerHTML = '<div class="no-results">No comparisons yet. Click + to start one.</div>';
+    renderBackupNudge();
     return;
   }
-  if(visible.length === 0){
-    const hint = document.createElement('div');
-    hint.className = 'no-results';
-    hint.textContent = 'No comparisons match your search.';
-    list.appendChild(hint);
+  if(active.length === 0 && archived.length === 0){
+    list.innerHTML = '<div class="no-results">No comparisons match your search.</div>';
+    renderBackupNudge();
     return;
   }
 
-  const pinned = visible.filter(c => c.pinned);
-  const unpinned = visible.filter(c => !c.pinned);
+  const pinned = active.filter(c => c.pinned);
+  const unpinned = active.filter(c => !c.pinned);
 
   const folderNames = Array.from(new Set(unpinned.map(c => c.folder || ''))).sort((a,b) => {
     if(a === '') return 1;
@@ -932,18 +878,36 @@ function renderSidebar(){
     return a.localeCompare(b);
   });
 
-  if(pinned.length){
-    renderGroup(list, 'Pinned', pinned, false, q);
-  }
+  if(pinned.length) renderGroup(list, 'Pinned', pinned, false, true);
   folderNames.forEach(name => {
     const items = unpinned.filter(c => (c.folder || '') === name);
-    renderGroup(list, name || 'Unsorted', items, true, q);
+    renderGroup(list, name || 'Unsorted', items, true, !!q);
+  });
+  if(archived.length){
+    renderGroup(list, 'Archived (' + archived.length + ')', archived, true, !!q, true);
+  }
+
+  renderBackupNudge();
+}
+
+function renderBackupNudge(){
+  loadKey(K_LAST_EXPORT).then(val => {
+    const el = document.getElementById('backupNudge');
+    if(!el) return;
+    if(!val){ el.textContent = ''; return; }
+    const days = Math.floor((Date.now() - parseInt(val, 10)) / 86400000);
+    if(days >= 30){
+      el.textContent = `Last exported ${days} days ago — consider a backup.`;
+      el.classList.add('backup-nudge');
+    } else {
+      el.textContent = `Last exported ${days === 0 ? 'today' : days + ' day' + (days===1?'':'s') + ' ago'}.`;
+      el.classList.remove('backup-nudge');
+    }
   });
 }
 
-function renderGroup(list, name, items, collapsible, forceExpand){
+function renderGroup(list, name, items, collapsible, forceExpand, isArchivedGroup){
   const collapsed = collapsible && !forceExpand && isFolderCollapsed(name);
-
   const header = document.createElement('div');
   header.className = 'group-header' + (collapsed ? ' collapsed' : '');
   header.innerHTML = `<span class="chev">&#9662;</span> ${escapeHtml(name)} <span class="group-count">${items.length}</span>`;
@@ -956,54 +920,39 @@ function renderGroup(list, name, items, collapsible, forceExpand){
 
   const body = document.createElement('div');
   body.className = 'group-body' + (collapsed ? ' collapsed' : '');
-  items.forEach(comp => body.appendChild(buildCompItem(comp)));
+  items.forEach(comp => body.appendChild(buildCompItem(comp, isArchivedGroup)));
   list.appendChild(body);
 }
 
-function escapeHtml(s){
-  const d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
-}
-
-function buildCompItem(comp){
+function buildCompItem(comp, isArchived){
   const div = document.createElement('div');
-  div.className = 'comp-item' + (comp.id === activeId ? ' active' : '');
-  div.draggable = true;
+  div.className = 'comp-item' + (comp.id === activeId ? ' active' : '') + (isArchived ? ' archived' : '');
+  div.draggable = !isArchived;
+  div.tabIndex = 0;
   div.dataset.id = comp.id;
   div.onclick = () => selectComparison(comp.id);
+  div.addEventListener('keydown', (e) => handleCompItemKeydown(e, comp.id));
 
-  div.addEventListener('dragstart', (e) => {
-    draggedCompId = comp.id;
-    div.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'move';
-  });
-  div.addEventListener('dragend', () => {
-    div.classList.remove('dragging');
-    document.querySelectorAll('.comp-item.drag-over').forEach(el => el.classList.remove('drag-over'));
-  });
-  div.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    if(draggedCompId && draggedCompId !== comp.id) div.classList.add('drag-over');
-  });
-  div.addEventListener('dragleave', () => div.classList.remove('drag-over'));
-  div.addEventListener('drop', (e) => {
-    e.preventDefault();
-    div.classList.remove('drag-over');
-    if(!draggedCompId || draggedCompId === comp.id) return;
-    const fromIdx = comparisons.findIndex(c => c.id === draggedCompId);
-    const toIdx = comparisons.findIndex(c => c.id === comp.id);
-    if(fromIdx === -1 || toIdx === -1) return;
-    const [moved] = comparisons.splice(fromIdx, 1);
-    comparisons.splice(toIdx, 0, moved);
-    draggedCompId = null;
-    flushSave();
-    renderSidebar();
-  });
+  if(!isArchived){
+    div.addEventListener('dragstart', (e) => { draggedCompId = comp.id; div.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+    div.addEventListener('dragend', () => { div.classList.remove('dragging'); document.querySelectorAll('.comp-item.drag-over').forEach(el => el.classList.remove('drag-over')); });
+    div.addEventListener('dragover', (e) => { e.preventDefault(); if(draggedCompId && draggedCompId !== comp.id) div.classList.add('drag-over'); });
+    div.addEventListener('dragleave', () => div.classList.remove('drag-over'));
+    div.addEventListener('drop', (e) => {
+      e.preventDefault(); div.classList.remove('drag-over');
+      if(!draggedCompId || draggedCompId === comp.id) return;
+      const fromIdx = comparisons.findIndex(c => c.id === draggedCompId);
+      const toIdx = comparisons.findIndex(c => c.id === comp.id);
+      if(fromIdx === -1 || toIdx === -1) return;
+      const [moved] = comparisons.splice(fromIdx, 1);
+      comparisons.splice(toIdx, 0, moved);
+      draggedCompId = null;
+      flushSave(); renderSidebar();
+    });
+  }
 
   const topRow = document.createElement('div');
   topRow.className = 'comp-top-row';
-
   const name = document.createElement('div');
   name.className = 'comp-name' + (comp.title ? '' : ' placeholder');
   name.textContent = comp.title || 'Untitled';
@@ -1015,91 +964,142 @@ function buildCompItem(comp){
   tally.innerHTML = `<span class="p">${comp.pros.length}</span> pros \u00b7 <span class="c">${comp.cons.length}</span> cons`;
   div.appendChild(tally);
 
-  const folderInput = document.createElement('input');
-  folderInput.className = 'comp-folder-input';
-  folderInput.placeholder = 'No folder';
-  folderInput.value = comp.folder || '';
-  folderInput.onclick = (e) => e.stopPropagation();
-  folderInput.oninput = (e) => updateFolder(comp.id, e.target.value);
-  folderInput.onblur = () => { flushSave(); renderSidebar(); };
-  div.appendChild(folderInput);
+  if(comp.confidence){
+    const conf = document.createElement('div');
+    conf.className = 'comp-confidence';
+    conf.textContent = comp.confidence;
+    div.appendChild(conf);
+  }
+
+  if(!isArchived){
+    const folderInput = document.createElement('input');
+    folderInput.className = 'comp-folder-input';
+    folderInput.placeholder = 'No folder';
+    folderInput.value = comp.folder || '';
+    folderInput.onclick = (e) => e.stopPropagation();
+    folderInput.oninput = (e) => updateFolder(comp.id, e.target.value);
+    folderInput.onblur = () => { flushSave(); renderSidebar(); };
+    div.appendChild(folderInput);
+  }
 
   const actions = document.createElement('div');
   actions.className = 'comp-actions';
 
-  const pinBtn = document.createElement('button');
-  pinBtn.className = 'pin-btn' + (comp.pinned ? ' pinned' : '');
-  pinBtn.title = comp.pinned ? 'Unpin' : 'Pin';
-  pinBtn.textContent = comp.pinned ? '\u2605' : '\u2606';
-  pinBtn.onclick = (e) => togglePin(comp.id, e);
-  actions.appendChild(pinBtn);
+  const kebabBtn = document.createElement('button');
+  kebabBtn.className = 'kebab-btn' + (openKebabId === comp.id ? ' open' : '');
+  kebabBtn.textContent = '\u22ef';
+  kebabBtn.title = 'More actions';
+  kebabBtn.onclick = (e) => { e.stopPropagation(); openKebabId = (openKebabId === comp.id ? null : comp.id); renderSidebar(); };
+  actions.appendChild(kebabBtn);
 
-  const delBtn = document.createElement('button');
-  delBtn.className = 'del-btn';
-  delBtn.title = 'Delete';
-  delBtn.textContent = '\u00d7';
-  delBtn.onclick = (e) => deleteComparison(comp.id, e);
-  actions.appendChild(delBtn);
+  const menu = document.createElement('div');
+  menu.className = 'kebab-menu' + (openKebabId === comp.id ? ' open' : '');
+  menu.onclick = (e) => e.stopPropagation();
 
+  if(isArchived){
+    const restoreBtn = document.createElement('button');
+    restoreBtn.textContent = 'Restore';
+    restoreBtn.onclick = () => restoreComparison(comp.id);
+    menu.appendChild(restoreBtn);
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'danger';
+    delBtn.textContent = 'Delete permanently';
+    delBtn.onclick = (e) => deleteForever(comp.id, e);
+    menu.appendChild(delBtn);
+  } else {
+    const pinBtn = document.createElement('button');
+    pinBtn.className = comp.pinned ? 'starred' : '';
+    pinBtn.textContent = comp.pinned ? '\u2605 Unpin' : '\u2606 Pin';
+    pinBtn.onclick = () => togglePin(comp.id);
+    menu.appendChild(pinBtn);
+
+    const dupBtn = document.createElement('button');
+    dupBtn.textContent = 'Duplicate';
+    dupBtn.onclick = () => { closeAllKebabs(); duplicateFrom(comp.id); };
+    menu.appendChild(dupBtn);
+
+    const archBtn = document.createElement('button');
+    archBtn.textContent = 'Archive';
+    archBtn.onclick = () => archiveComparison(comp.id);
+    menu.appendChild(archBtn);
+  }
+
+  actions.appendChild(menu);
   div.appendChild(actions);
-
   return div;
 }
 
-document.getElementById('searchInput').addEventListener('input', (e) => {
-  searchQuery = e.target.value;
-  renderSidebar();
-});
+// duplicate a specific (possibly non-active) comparison by id
+function duplicateFrom(id){
+  const comp = comparisons.find(c => c.id === id);
+  if(!comp) return;
+  const copy = {
+    id:genId(), title:(comp.title || 'Untitled') + ' (copy)', folder:comp.folder,
+    pinned:false, archived:false, confidence:comp.confidence,
+    pros:comp.pros.map(i => ({ id:genId(), text:i.text, category:i.category })),
+    cons:comp.cons.map(i => ({ id:genId(), text:i.text, category:i.category }))
+  };
+  const idx = comparisons.findIndex(c => c.id === id);
+  comparisons.splice(idx + 1, 0, copy);
+  activeId = copy.id;
+  flushSave(); saveActive();
+  renderSidebar(); renderMain();
+}
 
-/* ---------- main panel ---------- */
+document.getElementById('searchInput').addEventListener('input', (e) => { searchQuery = e.target.value; renderSidebar(); });
+document.addEventListener('click', () => { if(openKebabId){ openKebabId = null; renderSidebar(); } });
 
+/* keyboard nav within sidebar list */
+function handleCompItemKeydown(e, id){
+  if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); selectComparison(id); return; }
+  if(e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+  e.preventDefault();
+  const all = Array.from(document.querySelectorAll('.comp-item'));
+  const idx = all.findIndex(el => el.dataset.id === id);
+  if(idx === -1) return;
+  const nextIdx = e.key === 'ArrowDown' ? Math.min(all.length - 1, idx + 1) : Math.max(0, idx - 1);
+  all[nextIdx].focus();
+}
+
+/* =========================================================
+   MAIN PANEL
+   ========================================================= */
 function renderMain(){
   const comp = getActive();
   const noSel = document.getElementById('noSelection');
   const content = document.getElementById('content');
-
-  if(!comp){
-    noSel.style.display = 'block';
-    content.style.display = 'none';
-    return;
-  }
-  noSel.style.display = 'none';
-  content.style.display = 'block';
+  if(!comp){ noSel.style.display = 'block'; content.style.display = 'none'; return; }
+  noSel.style.display = 'none'; content.style.display = 'block';
 
   const mainThing = document.getElementById('mainThing');
   mainThing.value = comp.title || '';
-  mainThing.oninput = () => {
-    comp.title = mainThing.value;
-    scheduleSave();
-    renderSidebarTitleOnly(comp);
-  };
+  mainThing.oninput = () => { comp.title = mainThing.value; scheduleSave(); renderSidebarTitleOnly(comp); };
   mainThing.onblur = () => { flushSave(); renderSidebar(); };
+
+  const confInput = document.getElementById('confidenceInput');
+  confInput.value = comp.confidence || '';
+  confInput.oninput = () => { comp.confidence = confInput.value; scheduleSave(); };
+  confInput.onblur = () => { flushSave(); renderSidebar(); };
 
   renderList('pros', 'prosList', comp);
   renderList('cons', 'consList', comp);
   updateScoreboard(comp);
 }
-
-// lightweight sidebar refresh while typing a title (avoids full re-render/flicker)
 function renderSidebarTitleOnly(comp){
   const el = document.querySelector(`.comp-item[data-id="${comp.id}"] .comp-name`);
-  if(el){
-    el.textContent = comp.title || 'Untitled';
-    el.classList.toggle('placeholder', !comp.title);
-  }
+  if(el){ el.textContent = comp.title || 'Untitled'; el.classList.toggle('placeholder', !comp.title); }
 }
 
 function addItem(type){
   const comp = getActive();
   if(!comp) return;
-  comp[type].push({ id: genId(), text:'' });
-  flushSave();
-  renderMain();
-  renderSidebar();
+  comp[type].push({ id:genId(), text:'', category:'' });
+  flushSave(); renderMain(); renderSidebar();
   requestAnimationFrame(() => {
     const list = document.getElementById(type === 'pros' ? 'prosList' : 'consList');
-    const inputs = list.querySelectorAll('textarea.text');
-    if(inputs.length) inputs[inputs.length-1].focus();
+    const els = list.querySelectorAll('.text');
+    if(els.length) els[els.length-1].focus();
   });
 }
 
@@ -1108,27 +1108,13 @@ function removeItem(type, idx, li){
     const comp = getActive();
     if(!comp) return;
     const [removed] = comp[type].splice(idx, 1);
-    flushSave();
-    renderMain();
-    renderSidebar();
-
+    flushSave(); renderMain(); renderSidebar();
     showToast((type === 'pros' ? 'Pro' : 'Con') + ' removed.', {
-      onUndo: () => {
-        const c = getActive();
-        if(!c) return;
-        c[type].splice(idx, 0, removed);
-        flushSave();
-        renderMain();
-        renderSidebar();
-      }
+      onUndo: () => { const c = getActive(); if(!c) return; c[type].splice(idx, 0, removed); flushSave(); renderMain(); renderSidebar(); }
     });
   };
-  if(li){
-    li.classList.add('removing');
-    li.addEventListener('animationend', doRemove, { once:true });
-  } else {
-    doRemove();
-  }
+  if(li){ li.classList.add('removing'); li.addEventListener('animationend', doRemove, { once:true }); }
+  else doRemove();
 }
 
 function updateText(type, idx, val){
@@ -1136,10 +1122,10 @@ function updateText(type, idx, val){
   comp[type][idx].text = val;
   scheduleSave();
 }
-
-function autoGrow(el){
-  el.style.height = 'auto';
-  el.style.height = el.scrollHeight + 'px';
+function updateCategory(type, idx, val){
+  const comp = getActive();
+  comp[type][idx].category = val.trim();
+  scheduleSave();
 }
 
 let draggedItem = null; // { type, id }
@@ -1150,135 +1136,322 @@ function renderList(type, listId, comp){
   const items = comp[type];
 
   if(items.length === 0){
-    const hint = document.createElement('div');
-    hint.className = 'empty-hint';
-    hint.textContent = 'Click + to add a ' + (type === 'pros' ? 'pro' : 'con');
-    list.appendChild(hint);
+    list.innerHTML = `<div class="empty-hint">Click + to add a ${type === 'pros' ? 'pro' : 'con'}</div>`;
     return;
   }
 
-  items.forEach((item, idx) => {
-    const li = document.createElement('li');
-    li.className = 'item';
-    li.draggable = false; // dragging is initiated from the handle only
-    li.dataset.id = item.id;
+  // group by category, preserving first-seen order; blank category last
+  const catOrder = [];
+  items.forEach(it => { const c = it.category || ''; if(!catOrder.includes(c)) catOrder.push(c); });
+  catOrder.sort((a,b) => (a === '' ? 1 : b === '' ? -1 : 0));
 
-    const handle = document.createElement('div');
-    handle.className = 'drag-handle';
-    handle.title = 'Drag to reorder';
-    handle.textContent = '\u22ee\u22ee';
-    handle.addEventListener('mousedown', () => { li.draggable = true; });
-    handle.addEventListener('touchstart', () => { li.draggable = true; }, { passive:true });
-
-    li.addEventListener('dragstart', (e) => {
-      draggedItem = { type, id: item.id };
-      li.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
+  catOrder.forEach(cat => {
+    const groupItems = items.filter(it => (it.category || '') === cat);
+    if(catOrder.length > 1){
+      const header = document.createElement('div');
+      header.className = 'category-header';
+      header.textContent = cat || 'Uncategorized';
+      list.appendChild(header);
+    }
+    groupItems.forEach(item => {
+      const idx = items.indexOf(item);
+      list.appendChild(buildItemEl(type, item, idx, list));
     });
-    li.addEventListener('dragend', () => {
-      li.draggable = false;
-      li.classList.remove('dragging');
-      list.querySelectorAll('.item.drag-over').forEach(el => el.classList.remove('drag-over'));
-    });
-    li.addEventListener('dragover', (e) => {
-      if(!draggedItem || draggedItem.type !== type || draggedItem.id === item.id) return;
-      e.preventDefault();
-      li.classList.add('drag-over');
-    });
-    li.addEventListener('dragleave', () => li.classList.remove('drag-over'));
-    li.addEventListener('drop', (e) => {
-      e.preventDefault();
-      li.classList.remove('drag-over');
-      if(!draggedItem || draggedItem.type !== type || draggedItem.id === item.id) return;
-      const arr = getActive()[type];
-      const fromIdx = arr.findIndex(i => i.id === draggedItem.id);
-      const toIdx = arr.findIndex(i => i.id === item.id);
-      if(fromIdx === -1 || toIdx === -1) return;
-      const [moved] = arr.splice(fromIdx, 1);
-      arr.splice(toIdx, 0, moved);
-      draggedItem = null;
-      flushSave();
-      renderMain();
-    });
-
-    const textArea = document.createElement('textarea');
-    textArea.className = 'text';
-    textArea.rows = 1;
-    textArea.placeholder = type === 'pros' ? 'Reason for...' : 'Reason against...';
-    textArea.value = item.text;
-    textArea.addEventListener('input', (e) => {
-      updateText(type, idx, e.target.value);
-      autoGrow(e.target);
-    });
-    textArea.addEventListener('blur', flushSave);
-    textArea.addEventListener('keydown', (e) => {
-      if(e.key === 'Enter' && !e.shiftKey){
-        e.preventDefault();
-        flushSave();
-        addItem(type);
-      } else if(e.key === 'Escape'){
-        e.target.blur();
-      }
-    });
-
-    const delBtn = document.createElement('button');
-    delBtn.className = 'del';
-    delBtn.textContent = '\u00d7';
-    delBtn.onclick = () => removeItem(type, idx, li);
-
-    li.appendChild(handle);
-    li.appendChild(textArea);
-    li.appendChild(delBtn);
-    list.appendChild(li);
-
-    autoGrow(textArea);
   });
 }
 
-function updateScoreboard(comp){
-  const proTotal = comp.pros.length;
-  const conTotal = comp.cons.length;
-  document.getElementById('proCount').textContent = proTotal;
-  document.getElementById('conCount').textContent = conTotal;
+function buildItemEl(type, item, idx, list){
+  const li = document.createElement('li');
+  li.className = 'item';
+  li.draggable = false;
+  li.dataset.id = item.id;
 
-  const winnerLine = document.getElementById('winnerLine');
-  if(proTotal === 0 && conTotal === 0){
-    winnerLine.textContent = '';
-  } else if(proTotal > conTotal){
-    winnerLine.textContent = `Pros ahead by ${proTotal - conTotal}`;
-  } else if(conTotal > proTotal){
-    winnerLine.textContent = `Cons ahead by ${conTotal - proTotal}`;
-  } else {
-    winnerLine.textContent = "It's a tie";
-  }
+  const handle = document.createElement('div');
+  handle.className = 'drag-handle';
+  handle.title = 'Drag to reorder';
+  handle.textContent = '\u22ee\u22ee';
+  handle.addEventListener('mousedown', () => { li.draggable = true; });
+  handle.addEventListener('touchstart', () => { li.draggable = true; }, { passive:true });
+
+  li.addEventListener('dragstart', (e) => { draggedItem = { type, id:item.id }; li.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+  li.addEventListener('dragend', () => { li.draggable = false; li.classList.remove('dragging'); list.querySelectorAll('.item.drag-over').forEach(el => el.classList.remove('drag-over')); });
+  li.addEventListener('dragover', (e) => { if(!draggedItem || draggedItem.type !== type || draggedItem.id === item.id) return; e.preventDefault(); li.classList.add('drag-over'); });
+  li.addEventListener('dragleave', () => li.classList.remove('drag-over'));
+  li.addEventListener('drop', (e) => {
+    e.preventDefault(); li.classList.remove('drag-over');
+    if(!draggedItem || draggedItem.type !== type || draggedItem.id === item.id) return;
+    const arr = getActive()[type];
+    const fromIdx = arr.findIndex(i => i.id === draggedItem.id);
+    const toIdx = arr.findIndex(i => i.id === item.id);
+    if(fromIdx === -1 || toIdx === -1) return;
+    const [moved] = arr.splice(fromIdx, 1);
+    arr.splice(toIdx, 0, moved);
+    draggedItem = null;
+    flushSave(); renderMain();
+  });
+
+  const body = document.createElement('div');
+  body.className = 'item-body';
+
+  const textEl = document.createElement('div');
+  textEl.className = 'text';
+  textEl.contentEditable = 'true';
+  textEl.setAttribute('data-placeholder', type === 'pros' ? 'Reason for...' : 'Reason against...');
+  textEl.textContent = item.text || '';
+
+  textEl.addEventListener('focus', () => { textEl.textContent = item.text || ''; });
+  textEl.addEventListener('input', () => { updateText(type, idx, textEl.textContent); });
+  textEl.addEventListener('blur', () => {
+    flushSave();
+    textEl.innerHTML = renderMarkdownLite(item.text || '');
+  });
+  textEl.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); flushSave(); addItem(type); }
+    else if(e.key === 'Escape'){ e.target.blur(); }
+    else if(e.altKey && (e.key === 'ArrowDown' || e.key === 'ArrowUp')){
+      e.preventDefault();
+      const texts = Array.from(document.getElementById(type === 'pros' ? 'prosList' : 'consList').querySelectorAll('.text'));
+      const i = texts.indexOf(textEl);
+      const nextI = e.key === 'ArrowDown' ? Math.min(texts.length - 1, i + 1) : Math.max(0, i - 1);
+      texts[nextI].focus();
+    }
+  });
+  textEl.innerHTML = renderMarkdownLite(item.text || '');
+  body.appendChild(textEl);
+
+  const catInput = document.createElement('input');
+  catInput.className = 'item-category-input';
+  catInput.placeholder = 'Category (optional)';
+  catInput.value = item.category || '';
+  catInput.onclick = (e) => e.stopPropagation();
+  catInput.oninput = (e) => updateCategory(type, idx, e.target.value);
+  catInput.onblur = () => { flushSave(); renderMain(); };
+  body.appendChild(catInput);
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'del';
+  delBtn.textContent = '\u00d7';
+  delBtn.onclick = () => removeItem(type, idx, li);
+
+  li.appendChild(handle);
+  li.appendChild(body);
+  li.appendChild(delBtn);
+  return li;
 }
 
-/* ---------- global keyboard shortcuts ---------- */
+function updateScoreboard(comp){
+  const proTotal = comp.pros.length, conTotal = comp.cons.length;
+  document.getElementById('proCount').textContent = proTotal;
+  document.getElementById('conCount').textContent = conTotal;
+  const winnerLine = document.getElementById('winnerLine');
+  if(proTotal === 0 && conTotal === 0) winnerLine.textContent = '';
+  else if(proTotal > conTotal) winnerLine.textContent = `Pros ahead by ${proTotal - conTotal}`;
+  else if(conTotal > proTotal) winnerLine.textContent = `Cons ahead by ${conTotal - proTotal}`;
+  else winnerLine.textContent = "It's a tie";
+}
 
-document.addEventListener('keydown', (e) => {
-  // Escape: blur whatever is focused
-  if(e.key === 'Escape'){
-    if(document.activeElement && document.activeElement !== document.body){
-      document.activeElement.blur();
+/* =========================================================
+   EXPORT / IMPORT
+   ========================================================= */
+function downloadBlob(filename, content, mime){
+  const blob = new Blob([content], { type:mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function exportAll(){
+  const payload = { exportedAt: new Date().toISOString(), comparisons };
+  downloadBlob('pros-and-cons-export.json', JSON.stringify(payload, null, 2), 'application/json');
+  persist(K_LAST_EXPORT, String(Date.now()));
+  renderSidebar();
+}
+
+function exportMarkdown(){
+  const comp = getActive();
+  if(!comp) return;
+  let md = `# ${comp.title || 'Untitled'}\n\n`;
+  if(comp.confidence) md += `_${comp.confidence}_\n\n`;
+  md += `## Pros (${comp.pros.length})\n`;
+  comp.pros.forEach(i => { md += `- ${i.text || ''}${i.category ? ' _(' + i.category + ')_' : ''}\n`; });
+  md += `\n## Cons (${comp.cons.length})\n`;
+  comp.cons.forEach(i => { md += `- ${i.text || ''}${i.category ? ' _(' + i.category + ')_' : ''}\n`; });
+  downloadBlob((comp.title || 'comparison').replace(/[^\w\- ]+/g,'').trim() + '.md', md, 'text/markdown');
+  persist(K_LAST_EXPORT, String(Date.now()));
+  renderSidebar();
+}
+
+document.getElementById('importFileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const parsed = JSON.parse(reader.result);
+      const incoming = Array.isArray(parsed) ? parsed : (parsed.comparisons || []);
+      if(!Array.isArray(incoming)) throw new Error('bad format');
+      const withNewIds = incoming.map(c => ({
+        id: genId(),
+        title: c.title || '',
+        folder: c.folder || '',
+        pinned: false,
+        archived: false,
+        confidence: c.confidence || '',
+        pros: (c.pros || []).map(i => ({ id:genId(), text:i.text || '', category:i.category || '' })),
+        cons: (c.cons || []).map(i => ({ id:genId(), text:i.text || '', category:i.category || '' }))
+      }));
+      comparisons = comparisons.concat(withNewIds);
+      flushSave();
+      renderSidebar(); renderMain();
+      showToast(`Imported ${withNewIds.length} comparison${withNewIds.length===1?'':'s'}.`);
+    }catch(err){
+      showToast("Couldn't import — that file doesn't look right.", { error:true });
     }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+/* =========================================================
+   SIDE-BY-SIDE COMPARE MODAL
+   ========================================================= */
+function openCompareModal(){
+  compareModalOpen = true;
+  renderCompareModal();
+}
+function closeCompareModal(){
+  compareModalOpen = false;
+  document.getElementById('compareModalRoot').innerHTML = '';
+}
+function renderCompareModal(idA, idB){
+  const root = document.getElementById('compareModalRoot');
+  if(!compareModalOpen){ root.innerHTML = ''; return; }
+
+  const nonArchived = comparisons.filter(c => !c.archived);
+  idA = idA || (nonArchived[0] && nonArchived[0].id) || '';
+  idB = idB || (nonArchived[1] && nonArchived[1].id) || '';
+
+  const options = nonArchived.map(c => `<option value="${c.id}">${escapeHtml(c.title || 'Untitled')}</option>`).join('');
+
+  root.innerHTML = `
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>Compare two decisions</h2>
+          <button class="modal-close" id="modalCloseBtn">&times;</button>
+        </div>
+        ${nonArchived.length < 2 ? '<div class="empty-hint">You need at least two comparisons to compare them side by side.</div>' : `
+        <div class="compare-pickers">
+          <select id="pickA">${options}</select>
+          <select id="pickB">${options}</select>
+        </div>
+        <div class="compare-grid" id="compareGrid"></div>
+        `}
+      </div>
+    </div>`;
+
+  document.getElementById('modalCloseBtn').onclick = closeCompareModal;
+  document.getElementById('modalOverlay').addEventListener('click', (e) => { if(e.target.id === 'modalOverlay') closeCompareModal(); });
+
+  if(nonArchived.length < 2) return;
+
+  const pickA = document.getElementById('pickA');
+  const pickB = document.getElementById('pickB');
+  pickA.value = idA;
+  pickB.value = idB;
+  pickA.onchange = () => renderCompareGrid(pickA.value, pickB.value);
+  pickB.onchange = () => renderCompareGrid(pickA.value, pickB.value);
+  renderCompareGrid(idA, idB);
+}
+function renderCompareGrid(idA, idB){
+  const grid = document.getElementById('compareGrid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  [idA, idB].forEach(id => {
+    const comp = comparisons.find(c => c.id === id);
+    const side = document.createElement('div');
+    side.className = 'compare-side';
+    if(!comp){ side.innerHTML = '<div class="empty-hint">Not found.</div>'; grid.appendChild(side); return; }
+    side.innerHTML = `
+      <h3>${escapeHtml(comp.title || 'Untitled')}</h3>
+      ${comp.confidence ? `<div class="comp-confidence">${escapeHtml(comp.confidence)}</div>` : ''}
+      <div class="col pros" style="margin-bottom:14px;">
+        <div class="col-header">Pros (${comp.pros.length})</div>
+        <ul class="items">${comp.pros.map(i => `<li class="item"><div class="item-body"><div class="text">${renderMarkdownLite(i.text || '(empty)')}</div></div></li>`).join('') || '<div class="empty-hint">None yet</div>'}</ul>
+      </div>
+      <div class="col cons">
+        <div class="col-header">Cons (${comp.cons.length})</div>
+        <ul class="items">${comp.cons.map(i => `<li class="item"><div class="item-body"><div class="text">${renderMarkdownLite(i.text || '(empty)')}</div></div></li>`).join('') || '<div class="empty-hint">None yet</div>'}</ul>
+      </div>`;
+    grid.appendChild(side);
+  });
+}
+
+/* =========================================================
+   GLOBAL KEYBOARD SHORTCUTS
+   ========================================================= */
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape'){
+    if(compareModalOpen){ closeCompareModal(); return; }
+    if(document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
     return;
   }
-  // Ctrl/Cmd+N: new comparison (note: some browsers reserve this shortcut
-  // for opening a new window and won't let a page override it)
   if((e.ctrlKey || e.metaKey) && (e.key === 'n' || e.key === 'N')){
     e.preventDefault();
     newComparison();
   }
 });
 
-/* ---------- init ---------- */
+/* =========================================================
+   PWA MANIFEST (best effort — a locally opened file can't be
+   fully "installed" without being served over http(s) with a
+   service worker, but this wires up what a hosted copy needs)
+   ========================================================= */
+try{
+  const manifest = {
+    name: 'Pros & Cons',
+    short_name: 'Pros & Cons',
+    start_url: '.',
+    display: 'standalone',
+    background_color: '#faf8f3',
+    theme_color: '#2f7d5f',
+    icons: []
+  };
+  const manifestBlob = new Blob([JSON.stringify(manifest)], { type:'application/manifest+json' });
+  const link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = URL.createObjectURL(manifestBlob);
+  document.head.appendChild(link);
+}catch(e){ /* non-fatal */ }
 
-if(!comparisons.find(c => c.id === activeId)){
-  activeId = comparisons.length ? comparisons[0].id : null;
+/* =========================================================
+   INIT
+   ========================================================= */
+async function init(){
+  const [rawData, rawActive, rawSettings] = await Promise.all([
+    loadKey(K_DATA), loadKey(K_ACTIVE), loadKey(K_SETTINGS)
+  ]);
+
+  try{ comparisons = migrate(rawData ? JSON.parse(rawData) : []); }catch(e){ comparisons = []; }
+  activeId = rawActive || null;
+  try{ if(rawSettings) settings = Object.assign(settings, JSON.parse(rawSettings)); }catch(e){}
+
+  if(!comparisons.find(c => c.id === activeId)){
+    activeId = (comparisons.find(c => !c.archived) || {}).id || null;
+  }
+
+  // make sure data now lives in IndexedDB going forward (migrates any legacy localStorage-only data)
+  saveAllNow();
+  if(activeId) saveActive();
+  saveSettings();
+
+  applySettings();
+  renderSidebar();
+  renderMain();
 }
-applySettings();
-renderSidebar();
-renderMain();
+init();
 </script>
 </body>
 </html>
